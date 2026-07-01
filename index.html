@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QAQ Questverse - QBTI V2</title>
+    <title>QAQ Questverse - QBTI</title>
+    <!-- 引入雷达图的 Chart.js 库 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -86,7 +87,8 @@
 
         /* Gallery Grid */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 30px; }
-        .gallery-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; }
+        .gallery-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; transition: all 0.3s; }
+        .gallery-item:hover { border-color: var(--accent); transform: translateY(-3px); }
         .gallery-item h4 { font-size: 0.9rem; color: var(--text-main); margin-bottom: 5px; }
         .gallery-item p { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
 
@@ -141,20 +143,20 @@
             </div>
         </div>
 
-        <!-- 4. 全图鉴页 -->
-        <div id="gallery-section" class="section glass-panel" style="display: none;">
+        <!-- 4. 全图鉴页（已修复不跳转的问题） -->
+        <div id="gallery-section" class="section glass-panel">
             <h2 style="text-align: center; margin-bottom: 10px; font-weight: 300; letter-spacing: 2px;">QUESTVERSE 图鉴</h2>
             <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">We don’t grow by levels. We grow by beliefs.</p>
             <div class="gallery-grid" id="gallery-container"></div>
-            <div style="text-align: center; margin-top: 30px;">
-                <button class="btn btn-secondary" onclick="closeGallery()">返回我的结果</button>
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="btn btn-secondary" onclick="closeGallery()">← 返回我的结果</button>
             </div>
         </div>
 
     </div>
 
     <script>
-        // 核心角色数据库
+        // --- 核心角色数据库 ---
         const questies = {
             "001": { name: "Sunlion 太阳狮", profession: "Builder", slogan: "Build Possibilities.", desc: "你拥有极强的感染力与资源整合能力。别人看见的是热情，真正特别的是：你永远相信未来可以被创造。", believe: "Every possibility begins with someone willing to build it." },
             "002": { name: "Moonowl 月鸮", profession: "Researcher", slogan: "Go Deep. Find Truth.", desc: "极其聪慧的学者。别人寻找表面的答案，你寻找底层的本质。你永远相信：世界还有更深的一层。", believe: "Truth always lives one layer deeper." },
@@ -170,7 +172,7 @@
             "012": { name: "Stonehorn 岩角羊", profession: "Pioneer", slogan: "Walk Soft. Climb High.", desc: "温柔、坚定、勇敢，拥有极强主体性。别人看到你柔软的一面，真正厉害的是，目标一旦确定，就会不动声色地向前。", believe: "Gentleness and courage can live together." }
         };
 
-        // 扩充至 8 道题
+        // --- 完整 12 题库 ---
         const questions = [
             { q: "周末突然空出了一整个下午，外面正下着细雨，你最本能的倾向是？", a: [{ text: "终于有时间把脑子里那个拖了很久的小计划动手实现了。", points: ["001", "010", "007"] }, { text: "泡一杯茶，找一部纪录片，或深度整理一下凌乱的思绪。", points: ["002", "005", "008"] }, { text: "给几个好朋友发消息约咖啡，或者去感受一下烟火气。", points: ["009", "004", "011"] }, { text: "按原计划收拾房间、列好下周To-Do，享受一切井井有条的安心感。", points: ["003", "012", "006"] }] },
             { q: "大家一起聚餐，面对一本厚厚的、没人看过的菜单，你通常的状态是？", a: [{ text: "迅速扫视一遍，把大家必吃的和招牌菜先定下来，把控大局。", points: ["001", "003", "006"] }, { text: "敏锐发现角落里某个奇特或创新的菜品，提议点来试试。", points: ["007", "010", "008"] }, { text: "仔细询问朋友忌口，尽量点大家都喜欢吃的，照顾体验。", points: ["009", "004", "012"] }, { text: "默默研究菜单逻辑或观察其他桌，给出精准的推荐建议。", points: ["002", "005", "011"] }] },
@@ -179,12 +181,16 @@
             { q: "看一部精彩的电影或小说时，最让你起鸡皮疙瘩的瞬间是？", a: [{ text: "理清了所有复杂暗线，底层逻辑拼图严丝合缝地合拢。", points: ["002", "008", "005"] }, { text: "主角在绝境中不放弃，坚定守护所爱之人或初心的那一刻。", points: ["006", "003", "012"] }, { text: "巧妙的台词、充满张力的关系，以及故事背后对人性的隐喻。", points: ["011", "009", "004"] }, { text: "剧情彻底反转，主角打破规则，开创了完全意想不到的新局面。", points: ["007", "001", "010"] }] },
             { q: "当发现自己被误解，或团队里出现明显的意见分歧时，你会？", a: [{ text: "不急着辩解，把大家拉到一起，创造一个可以真诚对话的场域。", points: ["009", "012", "004"] }, { text: "默默梳理出整件事的时间线和核心矛盾点，用逻辑和事实说话。", points: ["002", "008", "005"] }, { text: "先稳住局势和大家的情绪，只要底线没破，分歧也可以是好事。", points: ["003", "006", "011"] }, { text: "用一个新的目标或破局点来转移注意力，在行动中解决分歧。", points: ["001", "010", "007"] }] },
             { q: "如果必须选择一种“超能力”在日常生活中使用，你最想要的是？", a: [{ text: "随时随地让周围人感到温暖和快乐的“治愈光环”。", points: ["004", "009", "011"] }, { text: "一眼看透事物运转规律和底线本质的“真理之眼”。", points: ["002", "008", "005"] }, { text: "把脑海中任何想象瞬间在现实中构建出来的“造物之手”。", points: ["001", "007", "012"] }, { text: "为自己和身边人抗下所有风险、绝对防御的“庇护结界”。", points: ["003", "006", "010"] }] },
-            { q: "当一天结束，你独自一人走在回家的路上，脑海里最常浮现的念头是？", a: [{ text: "“今天又学到了/发现了什么新的东西？”", points: ["002", "007", "008"] }, { text: "“明天要把那个计划推进一步，我已经等不及了。”", points: ["001", "010", "012"] }, { text: "“希望我爱的人和团队，今天也都一切顺利。”", points: ["003", "006", "005"] }, { text: "“今天发生的某件小事真有意思，可以记下来。”", points: ["011", "004", "009"] }] }
+            { q: "当一天结束，你独自一人走在回家的路上，脑海里最常浮现的念头是？", a: [{ text: "“今天又学到了/发现了什么新的东西？”", points: ["002", "007", "008"] }, { text: "“明天要把那个计划推进一步，我已经等不及了。”", points: ["001", "010", "012"] }, { text: "“希望我爱的人和团队，今天也都一切顺利。”", points: ["003", "006", "005"] }, { text: "“今天发生的某件小事真有意思，可以记下来。”", points: ["011", "004", "009"] }] },
+            { q: "当你听到一个非常不可思议的传闻或行业大新闻时，你通常会？", a: [{ text: "立刻去搜索各个视角的资料，试图拼凑出事情的完整真相。", points: ["002", "008", "005"] }, { text: "敏锐察觉到里面的机会，脑子里开始盘算这能变成什么新项目。", points: ["001", "010", "007"] }, { text: "第一时间分享给最在乎的朋友，大家一起探讨或吃瓜。", points: ["004", "009", "011"] }, { text: "保持观望，不轻易下结论，确保这股风波不影响当下的节奏。", points: ["003", "006", "012"] }] },
+            { q: "经历了一周极度消耗的工作后，周五晚上你最需要的‘充电’方式是？", a: [{ text: "找个安静的地方独处，沉浸在自己的小世界里，什么都不想。", points: ["005", "006", "003"] }, { text: "迫不及待地投身于真正的热爱中，比如搞点副业或研究新爱好。", points: ["007", "001", "012"] }, { text: "参加一场轻松的聚会，在和喜欢的人聊天大笑中恢复能量。", points: ["004", "009", "011"] }, { text: "去做一些能带来极强‘掌控感’的事，比如深度复盘或运动出汗。", points: ["010", "002", "008"] }] },
+            { q: "如果你能拥有一台时光机回到童年，你最想对自己说的一句话是？", a: [{ text: "“别害怕犯错，尽情去折腾吧，未来比你想象的更精彩！”", points: ["007", "010", "001"] }, { text: "“保持你那份温柔和敏锐，总有一天它们会成为你最强大的武器。”", points: ["009", "011", "012"] }, { text: "“多读书，多去问‘为什么’，这个世界的答案都在等待你去发现。”", points: ["002", "008", "005"] }, { text: "“慢慢来，你会成为一个能让很多人依靠的了不起的大人。”", points: ["003", "006", "004"] }] },
+            { q: "当一段漫长且艰难的旅程终于到达终点，看着眼前的风景，你内心的OS是？", a: [{ text: "“这只是一段路，下一座更高的山峰还在等我。”", points: ["008", "001", "012"] }, { text: "“太不容易了，还好这一路大家都在，谁也没有掉队。”", points: ["003", "006", "009"] }, { text: "“太有趣了！我要赶紧把这一路的奇遇讲给别人听！”", points: ["004", "011", "007"] }, { text: "“一切都结束了，但我已经在这个过程中，得到了想要的答案。”", points: ["002", "005", "010"] }] }
         ];
 
         let currentQuestion = 0;
         let scores = {};
-        let selectionHistory = []; // 记录历史选择用于返回
+        let selectionHistory = []; 
 
         function initScores() { for (let key in questies) scores[key] = 0; }
         initScores();
@@ -197,7 +203,7 @@
 
         function showQuestion() {
             const qData = questions[currentQuestion];
-            document.getElementById('question').innerText = `Q${currentQuestion + 1}. ${qData.q}`;
+            document.getElementById('question').innerText = `Q${currentQuestion + 1}/${questions.length}. ${qData.q}`;
             
             setTimeout(() => { document.getElementById('progress').style.width = `${((currentQuestion) / questions.length) * 100}%`; }, 50);
 
@@ -212,12 +218,11 @@
                 optionsContainer.appendChild(btn);
             });
 
-            // 控制返回按钮的显示/隐藏
             document.getElementById('back-btn').style.display = currentQuestion > 0 ? 'inline-block' : 'none';
         }
 
         function selectOption(points) {
-            selectionHistory.push(points); // 记录历史
+            selectionHistory.push(points); 
             points.forEach(p => scores[p] += 1);
             currentQuestion++;
 
@@ -231,8 +236,8 @@
 
         function goBack() {
             if (currentQuestion > 0) {
-                const lastPoints = selectionHistory.pop(); // 弹出上一次的选择
-                lastPoints.forEach(p => scores[p] -= 1); // 扣除分数
+                const lastPoints = selectionHistory.pop(); 
+                lastPoints.forEach(p => scores[p] -= 1); 
                 currentQuestion--;
                 showQuestion();
             }
@@ -257,21 +262,19 @@
             renderGallery();
         }
 
-        // 渲染雷达图
         let myChart = null;
         function renderRadarChart() {
-            // 将12个角色映射到6个核心维度
             const dimensionScores = [
-                scores["001"] + scores["007"], // 创造突破 (Builder, Explorer)
-                scores["002"] + scores["008"], // 智慧求真 (Researcher, Challenger)
-                scores["003"] + scores["006"] + scores["005"], // 守护托底 (Backbone, Warden, Guardian)
-                scores["009"] + scores["011"], // 共情链接 (Connector, Storyteller)
-                scores["010"] + scores["012"], // 先锋行动 (Vanguard, Pioneer)
-                scores["004"] + scores["009"]  // 情绪火花 (Spark + Connector辅)
+                scores["001"] + scores["007"], 
+                scores["002"] + scores["008"], 
+                scores["003"] + scores["006"] + scores["005"], 
+                scores["009"] + scores["011"], 
+                scores["010"] + scores["012"], 
+                scores["004"] + scores["009"]  
             ];
 
             const ctx = document.getElementById('radarChart').getContext('2d');
-            if (myChart) myChart.destroy(); // 避免重复渲染
+            if (myChart) myChart.destroy(); 
 
             myChart = new Chart(ctx, {
                 type: 'radar',
@@ -305,7 +308,6 @@
             });
         }
 
-        // 渲染全图鉴
         function renderGallery() {
             const container = document.getElementById('gallery-container');
             container.innerHTML = '';
