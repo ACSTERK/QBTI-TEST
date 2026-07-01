@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QAQ Questverse - QBTI 测试</title>
+    <style>
+        :root {
+            --bg-color: #0d0f12;
+            --text-main: #f0f0f0;
+            --text-muted: #8892b0;
+            --accent: #64ffda;
+            --card-bg: #112240;
+            --card-hover: #233554;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+
+        .subtitle {
+            font-style: italic;
+            color: var(--accent);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: rgba(100, 255, 218, 0.1);
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
+        }
+
+        /* Question Section */
+        #quiz-section, #result-section {
+            display: none;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: none;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+            line-height: 1.5;
+        }
+
+        .option-btn:hover {
+            background-color: var(--card-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Result Section */
+        .result-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            border-top: 4px solid var(--accent);
+            text-align: left;
+            position: relative;
+        }
+
+        .profession {
+            color: var(--accent);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .questy-name {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .slogan {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 3px solid var(--text-muted);
+        }
+
+        .character-desc {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .believe-box {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .believe-box strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--accent);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: var(--card-hover);
+            margin-bottom: 30px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer-text {
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: #555;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+        
+        <div id="home-section">
+            <h1>QAQ QUESTVERSE</h1>
+            <h2>寻找你的 Believe Badge</h2>
+            <p class="subtitle">"We don’t grow by levels. We grow by beliefs."</p>
+            <p style="margin-bottom: 40px; color: var(--text-muted); line-height: 1.6;">
+                欢迎来到 QAQ Questverse。<br>
+                这里没有等级，没有对错，只有不同的信念。<br>
+                准备好遇见你内心的那只 Questy 了吗？
+            </p>
+            <button class="btn" onclick="startQuiz()">开启探索 (Start Journey)</button>
+        </div>
+
+        <div id="quiz-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <div class="question-text" id="question">加载中...</div>
+            <div class="options-container" id="options">
+                </div>
+        </div>
+
+        <div id="result-section">
+            <h2 style="margin-bottom: 10px;">你的 Questy 信念化身是</h2>
+            <div class="result-card">
+                <div class="profession" id="res-profession">Profession</div>
+                <div class="questy-name" id="res-name">Name</div>
+                <div class="slogan" id="res-slogan">Slogan</div>
+                <div class="character-desc" id="res-desc">Description</div>
+                <div class="believe-box">
+                    <strong>BELIEVE</strong>
+                    <span id="res-believe">Believe text</span>
+                </div>
+            </div>
+            <button class="btn" style="margin-top: 30px;" onclick="location.reload()">重新测试</button>
+            <div class="footer-text">Build Possibilities. Welcome to QAQ Questverse.</div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Questy 数据库 (十二位角色) ---
+        const questies = {
+            "001": { id: "001", name: "Sunlion (太阳狮)", profession: "Builder", slogan: "Build Possibilities.", desc: "创造者。领导者。资源整合者。拥有极强感染力。别人看见的是热情，真正特别的是：你永远相信未来可以被创造。", believe: "Every possibility begins with someone willing to build it. (每一种可能，都始于有人愿意去创造。)" },
+            "002": { id: "002", name: "Moonowl (月鸮)", profession: "Researcher", slogan: "Go Deep. Find Truth.", desc: "Questverse 最聪明的学者。别人寻找答案，你寻找本质。永远相信：世界还有更深的一层。", believe: "Truth always lives one layer deeper." },
+            "003": { id: "003", name: "Everphant (永恒象)", profession: "Backbone", slogan: "Root Deep. Lift Others.", desc: "团队真正的脊梁。责任感、长期主义、格局。你明白真正的影响力不是跑得最快，而是让更多人一起成长。", believe: "Great things grow from steady hearts. (所有伟大的成长，都始于一颗坚定的心。)" },
+            "004": { id: "004", name: "Bloom Otter (花漾水獭)", profession: "Spark", slogan: "Smile First. Magic Follows.", desc: "幸运制造机，团队氛围担当。笑容就是你最大的超能力。", believe: "Small joys change everything. (每一个小快乐，都拥有改变世界的力量。)" },
+            "005": { id: "005", name: "Nightlynx (夜猞猁)", profession: "Guardian", slogan: "Stay Quiet. Stay Powerful.", desc: "最安静的观察者。别人看到的是沉默，真正厉害的是：你一直都在思考，总能看见别人忽略的细节。", believe: "Still waters run the deepest. (真正的力量，往往藏于平静之下。)" },
+            "006": { id: "006", name: "Starlight Deer (星辉灵鹿)", profession: "Warden", slogan: "Stand Steady. So Others Can Shine.", desc: "森林里的守望者。你不是聚光灯，却一直守护着整个团队。真正的力量，不是征服，而是守护。", believe: "True Strength Protects. (真正的强大，是守护。)" },
+            "007": { id: "007", name: "Wildcoon (野浣熊)", profession: "Explorer", slogan: "Break Rules. Find New Ways.", desc: "最自由的探索者。别人沿着地图走，你创造地图。喜欢尝试，喜欢突破，永远保持好奇。", believe: "Every new path begins with one brave step off the map." },
+            "008": { id: "008", name: "Stormraven (风暴渡鸦)", profession: "Challenger", slogan: "知命而不认命，顺势而不失己。", desc: "认知极高的挑战者。不断研究，不断突破。相信世界永远值得重新理解。", believe: "The future belongs to those who never stop questioning." },
+            "009": { id: "009", name: "Snowleap (雪跃豹)", profession: "Connector", slogan: "世界没有标准答案，而我就是一种答案。", desc: "真诚、共情、理解。别人因为你，开始相信人与人的力量。", believe: "Understanding is the beginning of every connection." },
+            "010": { id: "010", name: "Dawnmust (晨曦野马)", profession: "Vanguard", slogan: "Small Steps. Big Impact.", desc: "最热情的先锋，最可靠的行动派。别人还在讨论，你已经开始行动。", believe: "The fastest way forward is to start. (最快的前进方式，就是开始。)" },
+            "011": { id: "011", name: "Scarletfox (绯焰狐)", profession: "Storyteller", slogan: "Strong Enough To Be Soft.", desc: "幽默，反差，热爱文字。你总能把平淡的生活，讲成一个极具吸引力的好故事。", believe: "Every story begins with courage." },
+            "012": { id: "012", name: "Stonehorn (岩角羊)", profession: "Pioneer", slogan: "Walk Soft. Climb High.", desc: "温柔，坚定，勇敢，有主体性。别人看到的是柔软，真正厉害的是：你一直坚定向前。", believe: "Gentleness and courage can live together." }
+        };
+
+        // --- 测试题目 ---
+        const questions = [
+            {
+                q: "团队面临前所未有的未知挑战，你的第一直觉是？",
+                a: [
+                    { text: "立刻动手规划！没有什么比把想法变成现实更让人兴奋的了。", points: ["001", "010"] },
+                    { text: "深呼吸。我要先挖掘这背后的底层逻辑和核心问题。", points: ["002", "008"] },
+                    { text: "稳住大局。先盘点现有资源，确保团队基石不乱。", points: ["003", "005", "006"] },
+                    { text: "开个玩笑缓和气氛。大家情绪稳定，才有创造力！", points: ["004", "009", "011"] }
+                ]
+            },
+            {
+                q: "当你来到一片从未有人涉足的森林，你会？",
+                a: [
+                    { text: "抛弃现有的地图，自己蹚出一条全新的路。", points: ["007", "012"] },
+                    { text: "仔细观察周围的植被细节，记录下一切未知。", points: ["005", "002"] },
+                    { text: "跑在最前面，为身后的伙伴探明潜在的危险。", points: ["010", "006"] },
+                    { text: "坐在篝火旁，把这段经历写成迷人的故事。", points: ["011", "009"] }
+                ]
+            },
+            {
+                q: "面对既定的“规则”，你内心的真实态度是？",
+                a: [
+                    { text: "规则是用来打破、挑战和重新定义的。", points: ["007", "008"] },
+                    { text: "规则是为了让系统运转，让大家更好地共同成长。", points: ["003", "001"] },
+                    { text: "温柔但坚定地坚持自己的原则，不轻易被规则同化。", points: ["012", "011", "005"] },
+                    { text: "不在乎规则，只在乎马上行动，用结果说话。", points: ["010", "004"] }
+                ]
+            },
+            {
+                q: "你认为世界上最强大的力量来自于？",
+                a: [
+                    { text: "无中生有的创造力。", points: ["001", "007"] },
+                    { text: "看透事物本质的智慧。", points: ["002", "008"] },
+                    { text: "无论风雨，始终如一的守护与托底。", points: ["003", "006", "005"] },
+                    { text: "人与人之间真诚的连接与共情。", points: ["009", "004"] }
+                ]
+            },
+            {
+                q: "在你的心里，真正的“成长”意味着什么？",
+                a: [
+                    { text: "把一个个微小的快乐，变成改变世界的力量。", points: ["004", "011"] },
+                    { text: "在平静之中，蓄积最深沉、最庞大的力量。", points: ["005", "003", "006"] },
+                    { text: "不断向前，哪怕步伐很轻，也要攀登最高峰。", points: ["012", "002"] },
+                    { text: "只要开始了，就是最快的前进方式。行动即成长。", points: ["010", "001", "008"] }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let scores = {};
+
+        // 初始化计分板
+        for (let key in questies) {
+            scores[key] = 0;
+        }
+
+        function startQuiz() {
+            document.getElementById('home-section').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const qData = questions[currentQuestion];
+            document.getElementById('question').innerText = `Q${currentQuestion + 1}. ${qData.q}`;
+            
+            // 更新进度条
+            const progress = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = ''; // 清空上一题选项
+
+            qData.a.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = option.text;
+                btn.onclick = () => selectOption(option.points);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(points) {
+            // 加分
+            points.forEach(p => {
+                scores[p] += 1;
+            });
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('result-section').style.display = 'block';
+
+            // 计算最高分
+            let maxScore = 0;
+            let finalQuestyId = "001"; // 默认
+
+            for (let id in scores) {
+                if (scores[id] > maxScore) {
+                    maxScore = scores[id];
+                    finalQuestyId = id;
+                }
+            }
+
+            const result = questies[finalQuestyId];
+
+            document.getElementById('res-profession').innerText = result.profession;
+            document.getElementById('res-name').innerText = result.name;
+            document.getElementById('res-slogan').innerText = `"${result.slogan}"`;
+            document.getElementById('res-desc').innerText = result.desc;
+            document.getElementById('res-believe').innerText = result.believe;
+        }
+    </script>
+</body>
+</html>
