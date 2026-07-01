@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QAQ Questverse - QBTI</title>
+    <title>QAQ Questverse - QBTI V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-dark: #07090f;
@@ -16,275 +17,106 @@
             --card-border: rgba(255, 255, 255, 0.08);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
 
         body {
-            background: var(--bg-gradient);
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            line-height: 1.6;
+            background: var(--bg-gradient); background-color: var(--bg-dark); color: var(--text-main);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; line-height: 1.6;
+            padding: 40px 0;
         }
 
-        /* 动态星光背景修饰 */
         body::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0));
-            background-repeat: repeat;
-            background-size: 200px 200px;
-            opacity: 0.15;
-            z-index: -1;
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0));
+            background-size: 200px 200px; opacity: 0.15; z-index: -1; pointer-events: none;
         }
 
-        .container {
-            width: 90%;
-            max-width: 680px;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 1;
-        }
+        .container { width: 90%; max-width: 680px; position: relative; z-index: 1; }
 
-        /* 毛玻璃卡片基类 */
         .glass-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: var(--card-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border); border-radius: 16px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        h1 {
-            font-size: 2.2rem;
-            letter-spacing: 4px;
-            margin-bottom: 12px;
-            font-weight: 300;
-            text-align: center;
-        }
+        h1 { font-size: 2.2rem; letter-spacing: 4px; margin-bottom: 12px; font-weight: 300; text-align: center; }
+        .subtitle { text-align: center; font-size: 0.95rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 40px; text-transform: uppercase; }
+        .desc-text { text-align: center; color: var(--text-muted); margin-bottom: 50px; font-size: 1.05rem; }
 
-        .subtitle {
-            text-align: center;
-            font-size: 0.95rem;
-            color: var(--accent);
-            letter-spacing: 2px;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-        }
-
-        .desc-text {
-            text-align: center;
-            color: var(--text-muted);
-            margin-bottom: 50px;
-            font-size: 1.05rem;
-        }
-
-        /* 高级感按钮 */
         .btn {
-            display: block;
-            margin: 0 auto;
-            background: transparent;
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            padding: 14px 40px;
-            font-size: 1rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            display: inline-block; background: transparent; color: var(--accent); border: 1px solid var(--accent);
+            padding: 12px 30px; font-size: 0.95rem; border-radius: 30px; cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px; text-transform: uppercase;
         }
+        .btn:hover { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
+        .btn-secondary { color: var(--text-muted); border-color: var(--text-muted); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #fff; box-shadow: none; }
 
-        .btn:hover {
-            background: var(--accent);
-            color: var(--bg-dark);
-            box-shadow: 0 0 20px var(--accent-glow);
-            transform: translateY(-2px);
-        }
+        .section { display: none; animation: fadeUp 0.6s ease forwards; }
+        .section.active { display: block; }
 
-        /* 页面切换动画 */
-        .section {
-            display: none;
-            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 题目区域 */
-        .progress-container {
-            width: 100%;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            margin-bottom: 40px;
-            border-radius: 2px;
-            position: relative;
-        }
-
-        .progress-bar {
-            position: absolute;
-            top: 0; left: 0; height: 100%;
-            background: var(--accent);
-            width: 0%;
-            transition: width 0.5s ease;
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .question-title {
-            font-size: 1.4rem;
-            margin-bottom: 35px;
-            font-weight: 400;
-            line-height: 1.5;
-        }
-
-        .options-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
+        /* Progress & Questions */
+        .progress-container { width: 100%; height: 3px; background: rgba(255, 255, 255, 0.1); margin-bottom: 40px; border-radius: 2px; position: relative; }
+        .progress-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; transition: width 0.4s ease; box-shadow: 0 0 10px var(--accent-glow); }
+        
+        .question-title { font-size: 1.3rem; margin-bottom: 30px; font-weight: 400; line-height: 1.6; }
+        .options-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px; }
         .option-btn {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            padding: 20px 24px;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.3s ease;
-            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: var(--text-main);
+            padding: 18px 22px; border-radius: 12px; font-size: 1rem; cursor: pointer; text-align: left; transition: all 0.2s ease; line-height: 1.5;
         }
+        .option-btn:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(100, 255, 218, 0.3); transform: translateX(5px); }
 
-        .option-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(100, 255, 218, 0.3);
-            transform: translateX(5px);
-        }
+        .nav-buttons { display: flex; justify-content: flex-start; }
 
-        /* 结果区域 */
-        .result-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        /* Results & Chart */
+        .result-header { text-align: center; margin-bottom: 30px; }
+        .result-profession { color: var(--accent); font-size: 0.9rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; display: inline-block; border-bottom: 1px solid var(--accent-glow); padding-bottom: 4px; }
+        .result-name { font-size: 2.5rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 10px; }
+        .result-slogan { font-style: italic; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px; text-align: center; }
+        .result-desc { font-size: 1rem; color: #d1d5db; margin-bottom: 30px; text-align: justify; }
+        
+        .believe-card { background: rgba(0, 0, 0, 0.2); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 8px 8px 0; margin-bottom: 40px; }
+        .believe-card span { display: block; font-size: 0.75rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase; }
+        .believe-card strong { font-size: 1.1rem; font-weight: 400; line-height: 1.5; }
 
-        .result-profession {
-            color: var(--accent);
-            font-size: 0.9rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            display: inline-block;
-            border-bottom: 1px solid var(--accent-glow);
-            padding-bottom: 4px;
-        }
+        .chart-container { position: relative; height: 300px; width: 100%; margin-bottom: 40px; }
+        
+        .action-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
 
-        .result-name {
-            font-size: 2.8rem;
-            font-weight: 300;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
+        /* Gallery Grid */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 30px; }
+        .gallery-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; }
+        .gallery-item h4 { font-size: 0.9rem; color: var(--text-main); margin-bottom: 5px; }
+        .gallery-item p { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
 
-        .result-slogan {
-            font-style: italic;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .result-desc {
-            font-size: 1.05rem;
-            color: #d1d5db;
-            margin-bottom: 35px;
-        }
-
-        .believe-card {
-            background: rgba(0, 0, 0, 0.2);
-            border-left: 3px solid var(--accent);
-            padding: 24px;
-            border-radius: 0 8px 8px 0;
-            margin-bottom: 40px;
-        }
-
-        .believe-card span {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--accent);
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .believe-card strong {
-            font-size: 1.15rem;
-            font-weight: 400;
-            line-height: 1.5;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: 2px;
-        }
     </style>
 </head>
 <body>
 
     <div class="container" id="app">
         
-        <!-- 首屏欢迎页 -->
+        <!-- 1. 首屏 -->
         <div id="home-section" class="section active">
             <div class="glass-panel" style="text-align: center; padding: 60px 40px;">
                 <h1>QAQ QUESTVERSE</h1>
                 <div class="subtitle">Discover Your Believe Badge</div>
-                <p class="desc-text">
-                    这里没有等级，没有对错，<br>
-                    只有关于内心深处最纯粹的选择。<br><br>
-                    放轻松，跟随你的第一直觉。
-                </p>
+                <p class="desc-text">这里没有等级，没有对错。<br>只有关于内心深处最纯粹的信念选择。<br>准备好遇见你心中的 Questy 了吗？</p>
                 <button class="btn" onclick="startQuiz()">开启探索</button>
             </div>
         </div>
 
-        <!-- 答题页 -->
+        <!-- 2. 答题区 -->
         <div id="quiz-section" class="section glass-panel">
-            <div class="progress-container">
-                <div class="progress-bar" id="progress"></div>
-            </div>
+            <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
             <div class="question-title" id="question">加载中...</div>
-            <div class="options-grid" id="options">
-                <!-- 选项由 JS 动态注入 -->
+            <div class="options-grid" id="options"></div>
+            <div class="nav-buttons">
+                <button id="back-btn" class="btn btn-secondary" style="display:none;" onclick="goBack()">← 返回上一题</button>
             </div>
         </div>
 
-        <!-- 结果页 -->
+        <!-- 3. 结果页 -->
         <div id="result-section" class="section glass-panel">
             <div class="result-header">
                 <div class="result-profession" id="res-profession">PROFESSION</div>
@@ -292,95 +124,70 @@
                 <div class="result-slogan" id="res-slogan">"Slogan"</div>
             </div>
             
-            <div class="result-desc" id="res-desc">
-                Description goes here.
-            </div>
-
+            <div class="result-desc" id="res-desc"></div>
             <div class="believe-card">
                 <span>Core Believe</span>
-                <strong id="res-believe">Believe text goes here.</strong>
+                <strong id="res-believe"></strong>
             </div>
 
-            <button class="btn" onclick="location.reload()">重新测试</button>
+            <!-- 雷达图容器 -->
+            <div class="chart-container">
+                <canvas id="radarChart"></canvas>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn" onclick="location.reload()">重新测试</button>
+                <button class="btn btn-secondary" onclick="showGallery()">查看全图鉴</button>
+            </div>
         </div>
 
-        <div class="footer">WE DON'T GROW BY LEVELS. WE GROW BY BELIEFS.</div>
+        <!-- 4. 全图鉴页 -->
+        <div id="gallery-section" class="section glass-panel" style="display: none;">
+            <h2 style="text-align: center; margin-bottom: 10px; font-weight: 300; letter-spacing: 2px;">QUESTVERSE 图鉴</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">We don’t grow by levels. We grow by beliefs.</p>
+            <div class="gallery-grid" id="gallery-container"></div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-secondary" onclick="closeGallery()">返回我的结果</button>
+            </div>
+        </div>
 
     </div>
 
     <script>
-        // --- 核心角色数据库 ---
+        // 核心角色数据库
         const questies = {
-            "001": { id: "001", name: "Sunlion 太阳狮", profession: "Builder", slogan: "Build Possibilities.", desc: "你拥有极强的感染力与资源整合能力。别人看见的是你外在的热情，但真正特别的是：你永远相信未来可以被自己亲手创造。", believe: "Every possibility begins with someone willing to build it.\n每一种可能，都始于有人愿意去创造。" },
-            "002": { id: "002", name: "Moonowl 月鸮", profession: "Researcher", slogan: "Go Deep. Find Truth.", desc: "Questverse 中极其聪慧的学者。当别人在寻找表面的答案时，你总是在寻找底层的本质。你永远相信，世界还有更深的一层。", believe: "Truth always lives one layer deeper.\n真相，永远藏在更深的一层。" },
-            "003": { id: "003", name: "Everphant 永恒象", profession: "Backbone", slogan: "Root Deep. Lift Others.", desc: "团队真正的脊梁。你充满责任感，坚持长期主义。你明白真正的影响力从来不是自己跑得最快，而是能托举起更多人一起成长。", believe: "Great things grow from steady hearts.\n所有伟大的成长，都始于一颗坚定的心。" },
-            "004": { id: "004", name: "Bloom Otter 花漾水獭", profession: "Spark", slogan: "Smile First. Magic Follows.", desc: "天生的幸运制造机，团队不可或缺的氛围担当。你总能敏锐地捕捉到生活中的小确幸，笑容就是你改变周遭磁场的最大超能力。", believe: "Small joys change everything.\n每一个小快乐，都拥有改变世界的力量。" },
-            "005": { id: "005", name: "Nightlynx 夜猞猁", profession: "Guardian", slogan: "Stay Quiet. Stay Powerful.", desc: "最安静、最敏锐的观察者。别人看到的是你的沉默，真正厉害的是你一直都在思考。你总能看见别人忽略的细节，在暗中稳定全局。", believe: "Still waters run the deepest.\n真正的力量，往往藏于平静之下。" },
-            "006": { id: "006", name: "Starlight Deer 星辉灵鹿", profession: "Warden", slogan: "Stand Steady. So Others Can Shine.", desc: "森林里的守望者。你并不渴望站在最耀眼的聚光灯下，却一直默默守护着整个团队的边界与底线。你深知，真正的力量不是征服，而是守护。", believe: "True Strength Protects.\n真正的强大，是守护。" },
-            "007": { id: "007", name: "Wildcoon 野浣熊", profession: "Explorer", slogan: "Break Rules. Find New Ways.", desc: "最自由、最不受拘束的探索者。别人习惯沿着既定的地图走，而你喜欢创造新的地图。你享受打破常规，永远对未知保持着旺盛的好奇心。", believe: "Every new path begins with one brave step off the map.\n每一条新路，都始于勇敢踏出地图的那一步。" },
-            "008": { id: "008", name: "Stormraven 风暴渡鸦", profession: "Challenger", slogan: "知命而不认命，顺势而不失己。", desc: "拥有极高认知的挑战者。你不满足于现有的结论，不断研究、挑战并突破认知的边界。你始终相信，这个世界永远值得被重新理解。", believe: "The future belongs to those who never stop questioning.\n未来，属于那些永远不停止质疑的人。" },
-            "009": { id: "009", name: "Snowleap 雪跃豹", profession: "Connector", slogan: "世界没有标准答案，而我就是一种答案。", desc: "你拥有极强的共情力与同理心。你擅长倾听与理解，总能真诚地建立起人与人之间的桥梁。别人因为你，开始相信连接的力量。", believe: "Understanding is the beginning of every connection.\n理解，是每一次连接的开始。" },
-            "010": { id: "010", name: "Dawnmust 晨曦野马", profession: "Vanguard", slogan: "Small Steps. Big Impact.", desc: "最热情的先锋，最可靠的行动派。当别人还在纸上谈兵、犹豫不决时，你已经率先迈出了第一步。你坚信行动永远比等待更有力量。", believe: "The fastest way forward is to start.\n最快的前进方式，就是开始。" },
-            "011": { id: "011", name: "Scarletfox 绯焰狐", profession: "Storyteller", slogan: "Strong Enough To Be Soft.", desc: "幽默、充满反差感。你热爱生活中的文字与细节，总能敏锐地捕捉到那些动人的瞬间，并把平淡的日常，讲述成一个极具吸引力的好故事。", believe: "Every story begins with courage.\n每一个故事，都始于勇气。" },
-            "012": { id: "012", name: "Stonehorn 岩角羊", profession: "Pioneer", slogan: "Walk Soft. Climb High.", desc: "温柔、坚定、勇敢，拥有极强的自我主体性。别人看到的是你柔软和善的一面，真正厉害的是，你内心一旦确定目标，就会不动声色地一直向前。", believe: "Gentleness and courage can live together.\n温柔与勇敢，可以共生。" }
+            "001": { name: "Sunlion 太阳狮", profession: "Builder", slogan: "Build Possibilities.", desc: "你拥有极强的感染力与资源整合能力。别人看见的是热情，真正特别的是：你永远相信未来可以被创造。", believe: "Every possibility begins with someone willing to build it." },
+            "002": { name: "Moonowl 月鸮", profession: "Researcher", slogan: "Go Deep. Find Truth.", desc: "极其聪慧的学者。别人寻找表面的答案，你寻找底层的本质。你永远相信：世界还有更深的一层。", believe: "Truth always lives one layer deeper." },
+            "003": { name: "Everphant 永恒象", profession: "Backbone", slogan: "Root Deep. Lift Others.", desc: "团队真正的脊梁。充满责任感，坚持长期主义。你明白真正的影响力不是自己跑得最快，而是托举起更多人。", believe: "Great things grow from steady hearts." },
+            "004": { name: "Bloom Otter 花漾水獭", profession: "Spark", slogan: "Smile First. Magic Follows.", desc: "天生的幸运制造机，团队氛围担当。你总能敏锐捕捉小确幸，笑容就是你改变周遭磁场的最大超能力。", believe: "Small joys change everything." },
+            "005": { name: "Nightlynx 夜猞猁", profession: "Guardian", slogan: "Stay Quiet. Stay Powerful.", desc: "最安静、最敏锐的观察者。别人看到的是沉默，真正厉害的是你一直都在思考，在暗中稳定全局。", believe: "Still waters run the deepest." },
+            "006": { name: "Starlight Deer 星辉灵鹿", profession: "Warden", slogan: "Stand Steady. So Others Can Shine.", desc: "森林里的守望者。你并不渴望聚光灯，却一直默默守护着团队的边界。真正的力量不是征服，而是守护。", believe: "True Strength Protects." },
+            "007": { name: "Wildcoon 野浣熊", profession: "Explorer", slogan: "Break Rules. Find New Ways.", desc: "最自由的探索者。别人沿着地图走，你创造新的地图。享受打破常规，永远对未知保持旺盛的好奇心。", believe: "Every new path begins with one brave step off the map." },
+            "008": { name: "Stormraven 风暴渡鸦", profession: "Challenger", slogan: "知命而不认命，顺势而不失己。", desc: "拥有极高认知的挑战者。你不满足于现有的结论，不断挑战认知边界。相信世界永远值得被重新理解。", believe: "The future belongs to those who never stop questioning." },
+            "009": { name: "Snowleap 雪跃豹", profession: "Connector", slogan: "世界没有标准答案，而我就是一种答案。", desc: "拥有极强共情力。擅长倾听与理解，总能真诚地建立起人与人的桥梁。别人因为你，开始相信连接的力量。", believe: "Understanding is the beginning of every connection." },
+            "010": { name: "Dawnmust 晨曦野马", profession: "Vanguard", slogan: "Small Steps. Big Impact.", desc: "最热情的先锋行动派。别人还在纸上谈兵时，你已经率先迈出第一步。坚信行动永远比等待更有力量。", believe: "The fastest way forward is to start." },
+            "011": { name: "Scarletfox 绯焰狐", profession: "Storyteller", slogan: "Strong Enough To Be Soft.", desc: "幽默、充满反差感。热爱生活细节，总能敏锐捕捉动人瞬间，并把平淡的日常讲述成极具吸引力的好故事。", believe: "Every story begins with courage." },
+            "012": { name: "Stonehorn 岩角羊", profession: "Pioneer", slogan: "Walk Soft. Climb High.", desc: "温柔、坚定、勇敢，拥有极强主体性。别人看到你柔软的一面，真正厉害的是，目标一旦确定，就会不动声色地向前。", believe: "Gentleness and courage can live together." }
         };
 
-        // --- 进阶生活化题库 ---
+        // 扩充至 8 道题
         const questions = [
-            {
-                q: "周末突然空出了一整个下午，外面正下着细雨，你最本能的倾向是？",
-                a: [
-                    { text: "终于有时间把脑子里那个拖了很久的小灵感或计划动手实现了。", points: ["001", "010", "007"] },
-                    { text: "泡一杯热茶，找一部冷门高分纪录片，或者深度整理一下最近凌乱的思绪。", points: ["002", "005", "008"] },
-                    { text: "给几个好朋友发消息：“要出来喝杯咖啡吗？”或者去有人的地方感受烟火气。", points: ["009", "004", "011"] },
-                    { text: "按原计划收拾房间、列好下周的 To-Do，享受把一切安排得井井有条的安心感。", points: ["003", "012", "006"] }
-                ]
-            },
-            {
-                q: "大家一起聚餐，面对一本厚厚的、没人看过的菜单，你通常的状态是？",
-                a: [
-                    { text: "迅速扫视一遍，把大家必吃的和招牌菜先定下来，把控大局。", points: ["001", "003", "006"] },
-                    { text: "敏锐地发现菜单角落里某个极其奇特或创新的菜品，提议“点个这个试试吧！”", points: ["007", "010", "008"] },
-                    { text: "仔细询问几个朋友有没有忌口，尽量点大家都喜欢吃的，照顾每个人的体验。", points: ["009", "004", "012"] },
-                    { text: "默默研究菜单的分类逻辑、食材搭配，或者观察其他桌都在吃什么，给出精准建议。", points: ["002", "005", "011"] }
-                ]
-            },
-            {
-                q: "在一个陌生的城市旅行，你发现手机导航突然失效了，你的第一反应是？",
-                a: [
-                    { text: "随便选一个顺眼的方向继续走，相信迷路也是一种探险，风景也许更好。", points: ["007", "004", "011"] },
-                    { text: "找路边看起来和善的当地人，直接开口问路，顺便聊两句感受风土人情。", points: ["009", "001", "010"] },
-                    { text: "停下来，通过太阳方向、路牌规律或者回忆刚才走过的地标，试图在脑海里还原路线。", points: ["002", "005", "008"] },
-                    { text: "找个最近的咖啡馆先坐下，稳住同伴的情绪，等手机恢复信号或者买张纸质地图。", points: ["003", "006", "012"] }
-                ]
-            },
-            {
-                q: "如果要给一个极其重要的朋友挑选生日礼物，你的挑选标准通常是？",
-                a: [
-                    { text: "实用且经久耐用，能长久地陪伴他，哪怕不够花哨。", points: ["003", "006", "005"] },
-                    { text: "绝对独特、新奇，最好是他从来没见过、甚至有点打破常理的东西。", points: ["007", "008", "002"] },
-                    { text: "饱含某种特殊的寓意或共同回忆，哪怕只是一张手写的长信加一个小物件。", points: ["011", "009", "012"] },
-                    { text: "他最近正好能立刻用得上的，或者拆开瞬间能直接带给他极高情绪价值的。", points: ["001", "004", "010"] }
-                ]
-            },
-            {
-                q: "看一部精彩的电影或小说时，最让你起鸡皮疙瘩、觉得享受的瞬间是？",
-                a: [
-                    { text: "终于理清了所有复杂的设定和暗线，看到最底层的逻辑拼图严丝合缝地合拢。", points: ["002", "008", "005"] },
-                    { text: "主角在绝境中依然不放弃，坚定地守护自己所爱之人或初心的那一刻。", points: ["006", "003", "012"] },
-                    { text: "那些极其巧妙的台词、充满张力的人物关系，以及故事背后对人性的深刻隐喻。", points: ["011", "009", "004"] },
-                    { text: "剧情彻底反转，主角打破了所有既定规则，开创了一个完全意想不到的新局面。", points: ["007", "001", "010"] }
-                ]
-            }
+            { q: "周末突然空出了一整个下午，外面正下着细雨，你最本能的倾向是？", a: [{ text: "终于有时间把脑子里那个拖了很久的小计划动手实现了。", points: ["001", "010", "007"] }, { text: "泡一杯茶，找一部纪录片，或深度整理一下凌乱的思绪。", points: ["002", "005", "008"] }, { text: "给几个好朋友发消息约咖啡，或者去感受一下烟火气。", points: ["009", "004", "011"] }, { text: "按原计划收拾房间、列好下周To-Do，享受一切井井有条的安心感。", points: ["003", "012", "006"] }] },
+            { q: "大家一起聚餐，面对一本厚厚的、没人看过的菜单，你通常的状态是？", a: [{ text: "迅速扫视一遍，把大家必吃的和招牌菜先定下来，把控大局。", points: ["001", "003", "006"] }, { text: "敏锐发现角落里某个奇特或创新的菜品，提议点来试试。", points: ["007", "010", "008"] }, { text: "仔细询问朋友忌口，尽量点大家都喜欢吃的，照顾体验。", points: ["009", "004", "012"] }, { text: "默默研究菜单逻辑或观察其他桌，给出精准的推荐建议。", points: ["002", "005", "011"] }] },
+            { q: "在一个陌生的城市旅行，你发现手机导航突然失效了，你的第一反应是？", a: [{ text: "随便选个方向继续走，相信迷路也是探险，风景也许更好。", points: ["007", "004", "011"] }, { text: "找路边看起来和善的当地人直接问路，顺便聊两句。", points: ["009", "001", "010"] }, { text: "停下来，通过路牌规律或回忆刚才的地标，试图还原路线。", points: ["002", "005", "008"] }, { text: "找个咖啡馆先坐下，稳住同伴情绪，等信号恢复。", points: ["003", "006", "012"] }] },
+            { q: "如果要给一个极其重要的朋友挑选生日礼物，你的标准通常是？", a: [{ text: "实用且经久耐用，能长久陪伴他，哪怕不够花哨。", points: ["003", "006", "005"] }, { text: "绝对独特、新奇，最好打破常规，让他眼前一亮。", points: ["007", "008", "002"] }, { text: "饱含特殊寓意或共同回忆，哪怕只是一封长信加小物件。", points: ["011", "009", "012"] }, { text: "他最近立刻用得上的，拆开瞬间能带来极高情绪价值的。", points: ["001", "004", "010"] }] },
+            { q: "看一部精彩的电影或小说时，最让你起鸡皮疙瘩的瞬间是？", a: [{ text: "理清了所有复杂暗线，底层逻辑拼图严丝合缝地合拢。", points: ["002", "008", "005"] }, { text: "主角在绝境中不放弃，坚定守护所爱之人或初心的那一刻。", points: ["006", "003", "012"] }, { text: "巧妙的台词、充满张力的关系，以及故事背后对人性的隐喻。", points: ["011", "009", "004"] }, { text: "剧情彻底反转，主角打破规则，开创了完全意想不到的新局面。", points: ["007", "001", "010"] }] },
+            { q: "当发现自己被误解，或团队里出现明显的意见分歧时，你会？", a: [{ text: "不急着辩解，把大家拉到一起，创造一个可以真诚对话的场域。", points: ["009", "012", "004"] }, { text: "默默梳理出整件事的时间线和核心矛盾点，用逻辑和事实说话。", points: ["002", "008", "005"] }, { text: "先稳住局势和大家的情绪，只要底线没破，分歧也可以是好事。", points: ["003", "006", "011"] }, { text: "用一个新的目标或破局点来转移注意力，在行动中解决分歧。", points: ["001", "010", "007"] }] },
+            { q: "如果必须选择一种“超能力”在日常生活中使用，你最想要的是？", a: [{ text: "随时随地让周围人感到温暖和快乐的“治愈光环”。", points: ["004", "009", "011"] }, { text: "一眼看透事物运转规律和底线本质的“真理之眼”。", points: ["002", "008", "005"] }, { text: "把脑海中任何想象瞬间在现实中构建出来的“造物之手”。", points: ["001", "007", "012"] }, { text: "为自己和身边人抗下所有风险、绝对防御的“庇护结界”。", points: ["003", "006", "010"] }] },
+            { q: "当一天结束，你独自一人走在回家的路上，脑海里最常浮现的念头是？", a: [{ text: "“今天又学到了/发现了什么新的东西？”", points: ["002", "007", "008"] }, { text: "“明天要把那个计划推进一步，我已经等不及了。”", points: ["001", "010", "012"] }, { text: "“希望我爱的人和团队，今天也都一切顺利。”", points: ["003", "006", "005"] }, { text: "“今天发生的某件小事真有意思，可以记下来。”", points: ["011", "004", "009"] }] }
         ];
 
         let currentQuestion = 0;
         let scores = {};
+        let selectionHistory = []; // 记录历史选择用于返回
 
-        // 初始化分数
-        for (let key in questies) {
-            scores[key] = 0;
-        }
+        function initScores() { for (let key in questies) scores[key] = 0; }
+        initScores();
 
         function startQuiz() {
             document.getElementById('home-section').classList.remove('active');
@@ -392,11 +199,7 @@
             const qData = questions[currentQuestion];
             document.getElementById('question').innerText = `Q${currentQuestion + 1}. ${qData.q}`;
             
-            // 进度条动画
-            setTimeout(() => {
-                const progress = ((currentQuestion + 1) / questions.length) * 100;
-                document.getElementById('progress').style.width = `${progress}%`;
-            }, 50);
+            setTimeout(() => { document.getElementById('progress').style.width = `${((currentQuestion) / questions.length) * 100}%`; }, 50);
 
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = ''; 
@@ -408,55 +211,120 @@
                 btn.onclick = () => selectOption(option.points);
                 optionsContainer.appendChild(btn);
             });
+
+            // 控制返回按钮的显示/隐藏
+            document.getElementById('back-btn').style.display = currentQuestion > 0 ? 'inline-block' : 'none';
         }
 
         function selectOption(points) {
-            points.forEach(p => {
-                scores[p] += 1;
-            });
-
+            selectionHistory.push(points); // 记录历史
+            points.forEach(p => scores[p] += 1);
             currentQuestion++;
 
             if (currentQuestion < questions.length) {
-                // 简单的淡出淡入效果过渡下一题
-                const quizSec = document.getElementById('quiz-section');
-                quizSec.style.opacity = '0';
-                setTimeout(() => {
-                    showQuestion();
-                    quizSec.style.opacity = '1';
-                }, 300);
+                showQuestion();
             } else {
-                showResult();
+                document.getElementById('progress').style.width = `100%`;
+                setTimeout(showResult, 400);
+            }
+        }
+
+        function goBack() {
+            if (currentQuestion > 0) {
+                const lastPoints = selectionHistory.pop(); // 弹出上一次的选择
+                lastPoints.forEach(p => scores[p] -= 1); // 扣除分数
+                currentQuestion--;
+                showQuestion();
             }
         }
 
         function showResult() {
             document.getElementById('quiz-section').classList.remove('active');
             
-            let maxScore = 0;
-            let finalQuestyId = "001"; // 兜底默认值
+            let maxScore = -1;
+            let finalId = "001";
+            for (let id in scores) { if (scores[id] > maxScore) { maxScore = scores[id]; finalId = id; } }
 
-            // 计算得分最高的角色
-            for (let id in scores) {
-                if (scores[id] > maxScore) {
-                    maxScore = scores[id];
-                    finalQuestyId = id;
+            const res = questies[finalId];
+            document.getElementById('res-profession').innerText = res.profession;
+            document.getElementById('res-name').innerText = res.name;
+            document.getElementById('res-slogan').innerText = `"${res.slogan}"`;
+            document.getElementById('res-desc').innerText = res.desc;
+            document.getElementById('res-believe').innerHTML = res.believe;
+
+            document.getElementById('result-section').classList.add('active');
+            renderRadarChart();
+            renderGallery();
+        }
+
+        // 渲染雷达图
+        let myChart = null;
+        function renderRadarChart() {
+            // 将12个角色映射到6个核心维度
+            const dimensionScores = [
+                scores["001"] + scores["007"], // 创造突破 (Builder, Explorer)
+                scores["002"] + scores["008"], // 智慧求真 (Researcher, Challenger)
+                scores["003"] + scores["006"] + scores["005"], // 守护托底 (Backbone, Warden, Guardian)
+                scores["009"] + scores["011"], // 共情链接 (Connector, Storyteller)
+                scores["010"] + scores["012"], // 先锋行动 (Vanguard, Pioneer)
+                scores["004"] + scores["009"]  // 情绪火花 (Spark + Connector辅)
+            ];
+
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if (myChart) myChart.destroy(); // 避免重复渲染
+
+            myChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['创造突破', '智慧求真', '守护托底', '共情链接', '先锋行动', '情绪火花'],
+                    datasets: [{
+                        label: '你的信念象限',
+                        data: dimensionScores,
+                        backgroundColor: 'rgba(100, 255, 218, 0.2)',
+                        borderColor: '#64ffda',
+                        pointBackgroundColor: '#64ffda',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#64ffda',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#9ca3af', font: { size: 12, family: '-apple-system' } },
+                            ticks: { display: false, min: 0 }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
                 }
+            });
+        }
+
+        // 渲染全图鉴
+        function renderGallery() {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = '';
+            for (let id in questies) {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `<h4>${questies[id].name}</h4><p>${questies[id].profession}</p>`;
+                container.appendChild(item);
             }
+        }
 
-            const result = questies[finalQuestyId];
+        function showGallery() {
+            document.getElementById('result-section').classList.remove('active');
+            document.getElementById('gallery-section').classList.add('active');
+        }
 
-            // 渲染结果
-            document.getElementById('res-profession').innerText = result.profession;
-            document.getElementById('res-name').innerText = result.name;
-            document.getElementById('res-slogan').innerText = `"${result.slogan}"`;
-            document.getElementById('res-desc').innerText = result.desc;
-            
-            // 处理换行符
-            document.getElementById('res-believe').innerHTML = result.believe.replace('\n', '<br>');
-
-            const resSec = document.getElementById('result-section');
-            resSec.classList.add('active');
+        function closeGallery() {
+            document.getElementById('gallery-section').classList.remove('active');
+            document.getElementById('result-section').classList.add('active');
         }
     </script>
 </body>
