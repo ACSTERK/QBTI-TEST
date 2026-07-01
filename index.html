@@ -1,16 +1,343 @@
-// --- 测试题目（生活化 & 弱指向性版） ---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QAQ Questverse - QBTI</title>
+    <style>
+        :root {
+            --bg-dark: #07090f;
+            --bg-gradient: radial-gradient(circle at 50% 0%, #1a2235 0%, #07090f 70%);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #64ffda;
+            --accent-glow: rgba(100, 255, 218, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* 动态星光背景修饰 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 680px;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 毛玻璃卡片基类 */
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+            font-weight: 300;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .desc-text {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 50px;
+            font-size: 1.05rem;
+        }
+
+        /* 高级感按钮 */
+        .btn {
+            display: block;
+            margin: 0 auto;
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 14px 40px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        /* 页面切换动画 */
+        .section {
+            display: none;
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 题目区域 */
+        .progress-container {
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .question-title {
+            font-size: 1.4rem;
+            margin-bottom: 35px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            padding: 20px 24px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+            line-height: 1.5;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(100, 255, 218, 0.3);
+            transform: translateX(5px);
+        }
+
+        /* 结果区域 */
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .result-profession {
+            color: var(--accent);
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: inline-block;
+            border-bottom: 1px solid var(--accent-glow);
+            padding-bottom: 4px;
+        }
+
+        .result-name {
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .result-slogan {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .result-desc {
+            font-size: 1.05rem;
+            color: #d1d5db;
+            margin-bottom: 35px;
+        }
+
+        .believe-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--accent);
+            padding: 24px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 40px;
+        }
+
+        .believe-card span {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .believe-card strong {
+            font-size: 1.15rem;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+        
+        <!-- 首屏欢迎页 -->
+        <div id="home-section" class="section active">
+            <div class="glass-panel" style="text-align: center; padding: 60px 40px;">
+                <h1>QAQ QUESTVERSE</h1>
+                <div class="subtitle">Discover Your Believe Badge</div>
+                <p class="desc-text">
+                    这里没有等级，没有对错，<br>
+                    只有关于内心深处最纯粹的选择。<br><br>
+                    放轻松，跟随你的第一直觉。
+                </p>
+                <button class="btn" onclick="startQuiz()">开启探索</button>
+            </div>
+        </div>
+
+        <!-- 答题页 -->
+        <div id="quiz-section" class="section glass-panel">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+            <div class="question-title" id="question">加载中...</div>
+            <div class="options-grid" id="options">
+                <!-- 选项由 JS 动态注入 -->
+            </div>
+        </div>
+
+        <!-- 结果页 -->
+        <div id="result-section" class="section glass-panel">
+            <div class="result-header">
+                <div class="result-profession" id="res-profession">PROFESSION</div>
+                <div class="result-name" id="res-name">Name</div>
+                <div class="result-slogan" id="res-slogan">"Slogan"</div>
+            </div>
+            
+            <div class="result-desc" id="res-desc">
+                Description goes here.
+            </div>
+
+            <div class="believe-card">
+                <span>Core Believe</span>
+                <strong id="res-believe">Believe text goes here.</strong>
+            </div>
+
+            <button class="btn" onclick="location.reload()">重新测试</button>
+        </div>
+
+        <div class="footer">WE DON'T GROW BY LEVELS. WE GROW BY BELIEFS.</div>
+
+    </div>
+
+    <script>
+        // --- 核心角色数据库 ---
+        const questies = {
+            "001": { id: "001", name: "Sunlion 太阳狮", profession: "Builder", slogan: "Build Possibilities.", desc: "你拥有极强的感染力与资源整合能力。别人看见的是你外在的热情，但真正特别的是：你永远相信未来可以被自己亲手创造。", believe: "Every possibility begins with someone willing to build it.\n每一种可能，都始于有人愿意去创造。" },
+            "002": { id: "002", name: "Moonowl 月鸮", profession: "Researcher", slogan: "Go Deep. Find Truth.", desc: "Questverse 中极其聪慧的学者。当别人在寻找表面的答案时，你总是在寻找底层的本质。你永远相信，世界还有更深的一层。", believe: "Truth always lives one layer deeper.\n真相，永远藏在更深的一层。" },
+            "003": { id: "003", name: "Everphant 永恒象", profession: "Backbone", slogan: "Root Deep. Lift Others.", desc: "团队真正的脊梁。你充满责任感，坚持长期主义。你明白真正的影响力从来不是自己跑得最快，而是能托举起更多人一起成长。", believe: "Great things grow from steady hearts.\n所有伟大的成长，都始于一颗坚定的心。" },
+            "004": { id: "004", name: "Bloom Otter 花漾水獭", profession: "Spark", slogan: "Smile First. Magic Follows.", desc: "天生的幸运制造机，团队不可或缺的氛围担当。你总能敏锐地捕捉到生活中的小确幸，笑容就是你改变周遭磁场的最大超能力。", believe: "Small joys change everything.\n每一个小快乐，都拥有改变世界的力量。" },
+            "005": { id: "005", name: "Nightlynx 夜猞猁", profession: "Guardian", slogan: "Stay Quiet. Stay Powerful.", desc: "最安静、最敏锐的观察者。别人看到的是你的沉默，真正厉害的是你一直都在思考。你总能看见别人忽略的细节，在暗中稳定全局。", believe: "Still waters run the deepest.\n真正的力量，往往藏于平静之下。" },
+            "006": { id: "006", name: "Starlight Deer 星辉灵鹿", profession: "Warden", slogan: "Stand Steady. So Others Can Shine.", desc: "森林里的守望者。你并不渴望站在最耀眼的聚光灯下，却一直默默守护着整个团队的边界与底线。你深知，真正的力量不是征服，而是守护。", believe: "True Strength Protects.\n真正的强大，是守护。" },
+            "007": { id: "007", name: "Wildcoon 野浣熊", profession: "Explorer", slogan: "Break Rules. Find New Ways.", desc: "最自由、最不受拘束的探索者。别人习惯沿着既定的地图走，而你喜欢创造新的地图。你享受打破常规，永远对未知保持着旺盛的好奇心。", believe: "Every new path begins with one brave step off the map.\n每一条新路，都始于勇敢踏出地图的那一步。" },
+            "008": { id: "008", name: "Stormraven 风暴渡鸦", profession: "Challenger", slogan: "知命而不认命，顺势而不失己。", desc: "拥有极高认知的挑战者。你不满足于现有的结论，不断研究、挑战并突破认知的边界。你始终相信，这个世界永远值得被重新理解。", believe: "The future belongs to those who never stop questioning.\n未来，属于那些永远不停止质疑的人。" },
+            "009": { id: "009", name: "Snowleap 雪跃豹", profession: "Connector", slogan: "世界没有标准答案，而我就是一种答案。", desc: "你拥有极强的共情力与同理心。你擅长倾听与理解，总能真诚地建立起人与人之间的桥梁。别人因为你，开始相信连接的力量。", believe: "Understanding is the beginning of every connection.\n理解，是每一次连接的开始。" },
+            "010": { id: "010", name: "Dawnmust 晨曦野马", profession: "Vanguard", slogan: "Small Steps. Big Impact.", desc: "最热情的先锋，最可靠的行动派。当别人还在纸上谈兵、犹豫不决时，你已经率先迈出了第一步。你坚信行动永远比等待更有力量。", believe: "The fastest way forward is to start.\n最快的前进方式，就是开始。" },
+            "011": { id: "011", name: "Scarletfox 绯焰狐", profession: "Storyteller", slogan: "Strong Enough To Be Soft.", desc: "幽默、充满反差感。你热爱生活中的文字与细节，总能敏锐地捕捉到那些动人的瞬间，并把平淡的日常，讲述成一个极具吸引力的好故事。", believe: "Every story begins with courage.\n每一个故事，都始于勇气。" },
+            "012": { id: "012", name: "Stonehorn 岩角羊", profession: "Pioneer", slogan: "Walk Soft. Climb High.", desc: "温柔、坚定、勇敢，拥有极强的自我主体性。别人看到的是你柔软和善的一面，真正厉害的是，你内心一旦确定目标，就会不动声色地一直向前。", believe: "Gentleness and courage can live together.\n温柔与勇敢，可以共生。" }
+        };
+
+        // --- 进阶生活化题库 ---
         const questions = [
             {
                 q: "周末突然空出了一整个下午，外面正下着细雨，你最本能的倾向是？",
                 a: [
-                    { text: "终于有时间把脑子里那个拖了很久的小灵感/计划动手实现了。", points: ["001", "010", "007"] },
+                    { text: "终于有时间把脑子里那个拖了很久的小灵感或计划动手实现了。", points: ["001", "010", "007"] },
                     { text: "泡一杯热茶，找一部冷门高分纪录片，或者深度整理一下最近凌乱的思绪。", points: ["002", "005", "008"] },
-                    { text: "给几个好朋友发消息：要出来喝杯咖啡吗？或者去有人的地方感受烟火气。", points: ["009", "004", "011"] },
+                    { text: "给几个好朋友发消息：“要出来喝杯咖啡吗？”或者去有人的地方感受烟火气。", points: ["009", "004", "011"] },
                     { text: "按原计划收拾房间、列好下周的 To-Do，享受把一切安排得井井有条的安心感。", points: ["003", "012", "006"] }
                 ]
             },
             {
-                q: "大家一起聚餐，面对一本厚厚的、没人看过的菜单，你通常的常态是？",
+                q: "大家一起聚餐，面对一本厚厚的、没人看过的菜单，你通常的状态是？",
                 a: [
                     { text: "迅速扫视一遍，把大家必吃的和招牌菜先定下来，把控大局。", points: ["001", "003", "006"] },
                     { text: "敏锐地发现菜单角落里某个极其奇特或创新的菜品，提议“点个这个试试吧！”", points: ["007", "010", "008"] },
@@ -41,8 +368,96 @@
                 a: [
                     { text: "终于理清了所有复杂的设定和暗线，看到最底层的逻辑拼图严丝合缝地合拢。", points: ["002", "008", "005"] },
                     { text: "主角在绝境中依然不放弃，坚定地守护自己所爱之人或初心的那一刻。", points: ["006", "003", "012"] },
-                    { text: "那些极其巧妙的台词、充满张力的人物关系，以及故事背后对人性的隐喻。", points: ["011", "009", "004"] },
+                    { text: "那些极其巧妙的台词、充满张力的人物关系，以及故事背后对人性的深刻隐喻。", points: ["011", "009", "004"] },
                     { text: "剧情彻底反转，主角打破了所有既定规则，开创了一个完全意想不到的新局面。", points: ["007", "001", "010"] }
                 ]
             }
         ];
+
+        let currentQuestion = 0;
+        let scores = {};
+
+        // 初始化分数
+        for (let key in questies) {
+            scores[key] = 0;
+        }
+
+        function startQuiz() {
+            document.getElementById('home-section').classList.remove('active');
+            document.getElementById('quiz-section').classList.add('active');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const qData = questions[currentQuestion];
+            document.getElementById('question').innerText = `Q${currentQuestion + 1}. ${qData.q}`;
+            
+            // 进度条动画
+            setTimeout(() => {
+                const progress = ((currentQuestion + 1) / questions.length) * 100;
+                document.getElementById('progress').style.width = `${progress}%`;
+            }, 50);
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = ''; 
+
+            qData.a.forEach((option) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = option.text;
+                btn.onclick = () => selectOption(option.points);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(points) {
+            points.forEach(p => {
+                scores[p] += 1;
+            });
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                // 简单的淡出淡入效果过渡下一题
+                const quizSec = document.getElementById('quiz-section');
+                quizSec.style.opacity = '0';
+                setTimeout(() => {
+                    showQuestion();
+                    quizSec.style.opacity = '1';
+                }, 300);
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-section').classList.remove('active');
+            
+            let maxScore = 0;
+            let finalQuestyId = "001"; // 兜底默认值
+
+            // 计算得分最高的角色
+            for (let id in scores) {
+                if (scores[id] > maxScore) {
+                    maxScore = scores[id];
+                    finalQuestyId = id;
+                }
+            }
+
+            const result = questies[finalQuestyId];
+
+            // 渲染结果
+            document.getElementById('res-profession').innerText = result.profession;
+            document.getElementById('res-name').innerText = result.name;
+            document.getElementById('res-slogan').innerText = `"${result.slogan}"`;
+            document.getElementById('res-desc').innerText = result.desc;
+            
+            // 处理换行符
+            document.getElementById('res-believe').innerHTML = result.believe.replace('\n', '<br>');
+
+            const resSec = document.getElementById('result-section');
+            resSec.classList.add('active');
+        }
+    </script>
+</body>
+</html>
