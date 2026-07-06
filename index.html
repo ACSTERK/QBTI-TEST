@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QAQ Questverse - QBTI</title>
+    <title>QAQ Questverse - QBTI V5</title>
     <!-- 引入雷达图的 Chart.js 库 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-dark: #07090f;
-            --bg-gradient: radial-gradient(circle at 50% 0%, #1a2235 0%, #07090f 70%);
+            --bg-dark: #05070a;
+            --bg-gradient: radial-gradient(circle at 50% 0%, #111827 0%, #05070a 70%);
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --accent: #64ffda;
             --accent-glow: rgba(100, 255, 218, 0.4);
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --card-border: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --danger: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -26,102 +27,99 @@
             padding: 40px 0;
         }
 
-        /* 星空背景动效 */
         body::before {
             content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0));
-            background-size: 200px 200px; opacity: 0.15; z-index: -1; pointer-events: none;
+            background-image: radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)), radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)), radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0));
+            background-size: 200px 200px; opacity: 0.1; z-index: -1; pointer-events: none;
         }
 
         .container { width: 90%; max-width: 680px; position: relative; z-index: 1; }
 
-        /* 毛玻璃面板 */
         .glass-panel {
-            background: var(--card-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border); border-radius: 16px; padding: 45px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border); border-radius: 12px; padding: 45px; box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7);
         }
 
-        /* 首页文学排版 */
-        h1 { font-size: 2.4rem; letter-spacing: 5px; margin-bottom: 15px; font-weight: 300; text-align: center; }
-        .subtitle { text-align: center; font-size: 0.95rem; color: var(--accent); letter-spacing: 3px; margin-bottom: 45px; text-transform: uppercase; }
+        h1 { font-size: 2.2rem; letter-spacing: 6px; margin-bottom: 15px; font-weight: 300; text-align: center; }
+        .subtitle { text-align: center; font-size: 0.9rem; color: var(--accent); letter-spacing: 4px; margin-bottom: 45px; text-transform: uppercase; }
         
         .literary-text {
-            text-align: center; color: var(--text-muted); margin-bottom: 50px; font-size: 1.05rem; line-height: 2;
-            letter-spacing: 1px;
+            text-align: center; color: var(--text-muted); margin-bottom: 50px; font-size: 1rem; line-height: 2.2; letter-spacing: 1px;
         }
-        .literary-text span { display: block; margin-bottom: 15px; }
+        .literary-text strong { color: var(--text-main); font-weight: 500; }
 
         .btn {
             display: inline-block; background: transparent; color: var(--accent); border: 1px solid var(--accent);
-            padding: 14px 35px; font-size: 0.95rem; border-radius: 30px; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-            letter-spacing: 2px; text-transform: uppercase;
+            padding: 14px 40px; font-size: 0.95rem; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; 
+            letter-spacing: 3px; text-transform: uppercase;
         }
-        .btn:hover { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
+        .btn:hover { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 20px var(--accent-glow); }
         .btn-secondary { color: var(--text-muted); border-color: var(--text-muted); }
-        .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #fff; box-shadow: none; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #fff; box-shadow: none; }
 
-        .section { display: none; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .section { display: none; animation: fadeUp 0.6s ease forwards; }
         .section.active { display: block; }
 
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         /* 答题区 */
-        .progress-container { width: 100%; height: 3px; background: rgba(255, 255, 255, 0.1); margin-bottom: 40px; border-radius: 2px; position: relative; }
-        .progress-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 10px var(--accent-glow); }
+        .progress-container { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.05); margin-bottom: 40px; position: relative; }
+        .progress-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; transition: width 0.4s ease; box-shadow: 0 0 10px var(--accent-glow); }
         
-        .question-title { font-size: 1.35rem; margin-bottom: 35px; font-weight: 400; line-height: 1.6; letter-spacing: 0.5px; }
-        .options-grid { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .question-title { font-size: 1.3rem; margin-bottom: 40px; font-weight: 400; line-height: 1.7; letter-spacing: 1px; }
+        .options-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
         .option-btn {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: var(--text-main);
-            padding: 20px 24px; border-radius: 12px; font-size: 1.05rem; cursor: pointer; text-align: left; transition: all 0.3s ease; line-height: 1.6;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); color: var(--text-main);
+            padding: 22px 24px; border-radius: 8px; font-size: 1.05rem; cursor: pointer; text-align: left; transition: all 0.2s ease; line-height: 1.6;
         }
-        .option-btn:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(100, 255, 218, 0.3); transform: translateX(5px); }
+        .option-btn:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(100, 255, 218, 0.5); padding-left: 30px; }
 
         .nav-buttons { display: flex; justify-content: flex-start; }
 
         /* 结果区 */
         .result-header { text-align: center; margin-bottom: 30px; }
-        .result-profession { color: var(--accent); font-size: 0.95rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 12px; display: inline-block; border-bottom: 1px solid var(--accent-glow); padding-bottom: 6px; }
-        .result-name { font-size: 2.8rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 12px; }
-        .result-slogan { font-style: italic; color: var(--text-muted); font-size: 1.15rem; margin-bottom: 35px; text-align: center; }
-        .result-desc { font-size: 1.05rem; color: #d1d5db; margin-bottom: 35px; text-align: justify; line-height: 1.8; }
+        .result-profession { color: var(--accent); font-size: 0.9rem; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 12px; display: inline-block; border-bottom: 1px solid var(--accent-glow); padding-bottom: 6px; }
+        .result-name { font-size: 3rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 12px; }
+        .result-slogan { font-style: italic; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 35px; text-align: center; }
+        .result-desc { font-size: 1.05rem; color: #d1d5db; margin-bottom: 35px; text-align: justify; line-height: 1.9; }
         
-        .believe-card { background: rgba(0, 0, 0, 0.2); border-left: 3px solid var(--accent); padding: 24px; border-radius: 0 8px 8px 0; margin-bottom: 45px; }
-        .believe-card span { display: block; font-size: 0.8rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; }
-        .believe-card strong { font-size: 1.15rem; font-weight: 400; line-height: 1.6; }
+        .believe-card { background: rgba(100, 255, 218, 0.05); border-left: 2px solid var(--accent); padding: 25px; margin-bottom: 45px; }
+        .believe-card span { display: block; font-size: 0.75rem; color: var(--accent); letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase; }
+        .believe-card strong { font-size: 1.15rem; font-weight: 400; line-height: 1.6; letter-spacing: 1px; }
 
         .chart-container { position: relative; height: 320px; width: 100%; margin-bottom: 45px; }
         
         .action-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
 
         /* 图鉴区 */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-top: 35px; }
-        .gallery-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 18px 15px; border-radius: 10px; text-align: center; transition: all 0.3s; }
-        .gallery-item:hover { border-color: var(--accent); transform: translateY(-4px); background: rgba(0,0,0,0.5); }
-        .gallery-item h4 { font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px; font-weight: 400; }
-        .gallery-item p { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 35px; }
+        .gallery-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 18px 10px; border-radius: 6px; text-align: center; transition: all 0.3s; }
+        .gallery-item:hover { border-color: var(--accent); background: rgba(100,255,218,0.05); }
+        .gallery-item h4 { font-size: 0.9rem; color: var(--text-main); margin-bottom: 6px; font-weight: 400; }
+        .gallery-item p { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; }
 
-        .footer { text-align: center; margin-top: 40px; font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); letter-spacing: 3px; }
+        .footer { text-align: center; margin-top: 50px; font-size: 0.7rem; color: rgba(255, 255, 255, 0.15); letter-spacing: 4px; }
     </style>
 </head>
 <body>
 
     <div class="container" id="app">
         
-        <!-- 1. 首屏 (高级文学排版) -->
+        <!-- 1. 首屏 -->
         <div id="home-section" class="section active">
             <div class="glass-panel" style="text-align: center;">
                 <h1>QAQ QUESTVERSE</h1>
-                <div class="subtitle">Discover Your Believe Badge</div>
+                <div class="subtitle">Definitive Belief Test</div>
                 
                 <div class="literary-text">
-                    <span>我们一生都在被各种尺度衡量：<br>等级、职级、分数与世俗的标签。</span>
-                    <span>但在 Questverse 的浩瀚星图里，这些都不足一提。<br>这里是一座只为“信念”而建的避难所。</span>
-                    <span>你无需证明自己有多优秀，只需倾听内心最原始的震颤。<br>褪去所有的社会身份，跟随你的直觉，走入这片迷雾。</span>
-                    <span style="color: #f3f4f6; margin-top: 25px;">去见见那个，在潜意识深处等待了你许久的自己。</span>
+                    这里的每一道题，都没有“双赢”的选项。<br>
+                    你必须在 <strong>速度与完美</strong> 之间妥协，<br>
+                    在 <strong>秩序与破坏</strong> 之间站队，<br>
+                    在 <strong>冰冷的真相</strong> 与 <strong>温热的人心</strong> 之间做出抉择。<br>
+                    <span style="display: block; margin-top: 20px; color: var(--accent);">直面你的底色，不要犹豫。</span>
                 </div>
 
-                <button class="btn" onclick="startQuiz()">步入星图</button>
+                <button class="btn" onclick="startQuiz()">开始剥离</button>
             </div>
             <div class="footer">WE DON'T GROW BY LEVELS. WE GROW BY BELIEFS.</div>
         </div>
@@ -132,7 +130,7 @@
             <div class="question-title" id="question">加载中...</div>
             <div class="options-grid" id="options"></div>
             <div class="nav-buttons">
-                <button id="back-btn" class="btn btn-secondary" style="display:none; padding: 10px 20px; font-size: 0.85rem;" onclick="goBack()">← 返回上一题</button>
+                <button id="back-btn" class="btn btn-secondary" style="display:none; padding: 10px 20px; font-size: 0.8rem; border: none;" onclick="goBack()">← 返回重选</button>
             </div>
         </div>
 
@@ -164,13 +162,13 @@
 
         <!-- 4. 全图鉴页 -->
         <div id="gallery-section" class="section glass-panel">
-            <h2 style="text-align: center; margin-bottom: 12px; font-weight: 300; letter-spacing: 3px;">QUESTVERSE 图鉴</h2>
-            <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px;">12 种信念，12 种改变世界的方式。</p>
+            <h2 style="text-align: center; margin-bottom: 12px; font-weight: 300; letter-spacing: 4px;">QUESTVERSE 图鉴</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px;">12 种信念，12 种改变世界的方式。</p>
             
             <div class="gallery-grid" id="gallery-container"></div>
             
             <div style="text-align: center; margin-top: 45px;">
-                <button class="btn btn-secondary" onclick="closeGallery()">← 返回我的结果</button>
+                <button class="btn btn-secondary" onclick="closeGallery()">← 返回</button>
             </div>
         </div>
 
@@ -179,128 +177,128 @@
     <script>
         // --- 核心角色数据库 ---
         const questies = {
-            "001": { name: "Sunlion 太阳狮", profession: "Builder", slogan: "Build Possibilities.", desc: "你拥有极强的感染力与资源整合能力。别人看见的是热情，真正特别的是：你永远相信未来可以被创造。", believe: "Every possibility begins with someone willing to build it." },
-            "002": { name: "Moonowl 月鸮", profession: "Researcher", slogan: "Go Deep. Find Truth.", desc: "极其聪慧的学者。别人寻找表面的答案，你寻找底层的本质。你永远相信：世界还有更深的一层。", believe: "Truth always lives one layer deeper." },
-            "003": { name: "Everphant 永恒象", profession: "Backbone", slogan: "Root Deep. Lift Others.", desc: "团队真正的脊梁。充满责任感，坚持长期主义。你明白真正的影响力不是自己跑得最快，而是托举起更多人。", believe: "Great things grow from steady hearts." },
-            "004": { name: "Bloom Otter 花漾水獭", profession: "Spark", slogan: "Smile First. Magic Follows.", desc: "天生的幸运制造机，团队氛围担当。你总能敏锐捕捉小确幸，笑容就是你改变周遭磁场的最大超能力。", believe: "Small joys change everything." },
-            "005": { name: "Nightlynx 夜猞猁", profession: "Guardian", slogan: "Stay Quiet. Stay Powerful.", desc: "最安静、最敏锐的观察者。别人看到的是沉默，真正厉害的是你一直都在思考，在暗中稳定全局。", believe: "Still waters run the deepest." },
-            "006": { name: "Starlight Deer 星辉灵鹿", profession: "Warden", slogan: "Stand Steady. So Others Can Shine.", desc: "森林里的守望者。你并不渴望聚光灯，却一直默默守护着团队的边界。真正的力量不是征服，而是守护。", believe: "True Strength Protects." },
-            "007": { name: "Wildcoon 野浣熊", profession: "Explorer", slogan: "Break Rules. Find New Ways.", desc: "最自由的探索者。别人沿着地图走，你创造新的地图。享受打破常规，永远对未知保持旺盛的好奇心。", believe: "Every new path begins with one brave step off the map." },
-            "008": { name: "Stormraven 风暴渡鸦", profession: "Challenger", slogan: "知命而不认命，顺势而不失己。", desc: "拥有极高认知的挑战者。你不满足于现有的结论，不断挑战认知边界。相信世界永远值得被重新理解。", believe: "The future belongs to those who never stop questioning." },
-            "009": { name: "Snowleap 雪跃豹", profession: "Connector", slogan: "世界没有标准答案，而我就是一种答案。", desc: "拥有极强共情力。擅长倾听与理解，总能真诚地建立起人与人的桥梁。别人因为你，开始相信连接的力量。", believe: "Understanding is the beginning of every connection." },
-            "010": { name: "Dawnmust 晨曦野马", profession: "Vanguard", slogan: "Small Steps. Big Impact.", desc: "最热情的先锋行动派。别人还在纸上谈兵时，你已经率先迈出第一步。坚信行动永远比等待更有力量。", believe: "The fastest way forward is to start." },
-            "011": { name: "Scarletfox 绯焰狐", profession: "Storyteller", slogan: "Strong Enough To Be Soft.", desc: "幽默、充满反差感。热爱生活细节，总能敏锐捕捉动人瞬间，并把平淡的日常讲述成极具吸引力的好故事。", believe: "Every story begins with courage." },
-            "012": { name: "Stonehorn 岩角羊", profession: "Pioneer", slogan: "Walk Soft. Climb High.", desc: "温柔、坚定、勇敢，拥有极强主体性。别人看到你柔软的一面，真正厉害的是，目标一旦确定，就会不动声色地向前。", believe: "Gentleness and courage can live together." }
+            "001": { name: "Sunlion 太阳狮", profession: "Builder", slogan: "Build Possibilities.", desc: "天生的破局者与造物主。你极其厌恶纸上谈兵，对你来说，与其争论对错，不如先造出一个原型。你强悍的资源整合能力，能让一切“不可能”落地。", believe: "Every possibility begins with someone willing to build it." },
+            "002": { name: "Moonowl 月鸮", profession: "Researcher", slogan: "Go Deep. Find Truth.", desc: "极端理性的本质洞察者。你无法忍受表面的繁荣与逻辑的漏洞。在所有人盲目向前冲时，只有你会停下来，用手术刀般的锐利剥开事物最底层的真相。", believe: "Truth always lives one layer deeper." },
+            "003": { name: "Everphant 永恒象", profession: "Backbone", slogan: "Root Deep. Lift Others.", desc: "系统最稳固的承重墙。你不追求片刻的爆发，只相信长期的复利。当团队陷入混乱与绝望时，你那极其强悍的兜底能力和秩序感，是所有人最后的安全感。", believe: "Great things grow from steady hearts." },
+            "004": { name: "Bloom Otter 花漾水獭", profession: "Spark", slogan: "Smile First. Magic Follows.", desc: "不可或缺的情绪反应堆。你拥有极其罕见的能量场，能在最压抑的高压环境中撕开一道光。你深知，有时候解决问题的不是冷冰冰的逻辑，而是人心。", believe: "Small joys change everything." },
+            "005": { name: "Nightlynx 夜猞猁", profession: "Guardian", slogan: "Stay Quiet. Stay Powerful.", desc: "最危险也最敏锐的哨兵。你习惯游离在中心之外，冷眼旁观全局。你极度厌恶风险失控，总能在危机爆发前，悄无声息地拔掉最致命的引信。", believe: "Still waters run the deepest." },
+            "006": { name: "Starlight Deer 星辉灵鹿", profession: "Warden", slogan: "Stand Steady. So Others Can Shine.", desc: "极具牺牲精神的边界守望者。真正的强大往往伴随着克制。你用极其坚定的底线护住团队的软肋，宁愿自己扛下所有反噬，也要让前方的人毫无后顾之忧。", believe: "True Strength Protects." },
+            "007": { name: "Wildcoon 野浣熊", profession: "Explorer", slogan: "Break Rules. Find New Ways.", desc: "极致的规则破坏者与拓荒人。你天生反骨，极其厌恶被既定的框架束缚。就算前面是万丈深渊，只要那是张未知的地图，你也会毫不犹豫地跳下去。", believe: "Every new path begins with one brave step off the map." },
+            "008": { name: "Stormraven 风暴渡鸦", profession: "Challenger", slogan: "知命而不认命，顺势而不失己。", desc: "认知的颠覆者。你不敬畏权威，只敬畏真理。你最擅长的事，就是把那些被所有人奉为圭臬的“常识”撕碎，在废墟上建立起更高维的理解。", believe: "The future belongs to those who never stop questioning." },
+            "009": { name: "Snowleap 雪跃豹", profession: "Connector", slogan: "世界没有标准答案，而我就是一种答案。", desc: "高维度的共情者与翻译官。你能够敏锐地穿透每个人外表的伪装，触及他们最真实的脆弱。你用无可挑剔的真诚，在孤岛之间拉起最坚韧的索桥。", believe: "Understanding is the beginning of every connection." },
+            "010": { name: "Dawnmust 晨曦野马", profession: "Vanguard", slogan: "Small Steps. Big Impact.", desc: "绝对的行动派先锋。你信奉“先开火，后瞄准”。当别人还在因为恐惧未知而疯狂推演时，你已经率先杀入战阵，用极其粗暴但有效的第一步撕开裂口。", believe: "The fastest way forward is to start." },
+            "011": { name: "Scarletfox 绯焰狐", profession: "Storyteller", slogan: "Strong Enough To Be Soft.", desc: "重塑现实的叙事者。你极其擅长捕捉那些极其微小、荒诞或痛苦的瞬间，并将其翻转为充满张力的意义。你能够用一段故事，重新定义整个战局的士气。", believe: "Every story begins with courage." },
+            "012": { name: "Stonehorn 岩角羊", profession: "Pioneer", slogan: "Walk Soft. Climb High.", desc: "内核极其坚硬的攀登者。你外表温柔，但极具主体性。一旦你在内心锚定了那个顶点，哪怕一路上所有人都放弃了，你也会不动声色地、死死咬住目标向上爬。", believe: "Gentleness and courage can live together." }
         };
 
-        // --- V4.0 锐利版 12 题库 ---
+        // --- V5.0 极致锐利版 12 题库 (互斥设计，拒绝模棱两可) ---
         const questions = [
             {
-                q: "团队遭遇了一个突发且致命的危机，前期的计划全部报废。你的第一本能是？",
+                q: "项目到了交付的死线，但你发现底层逻辑有一个极其隐蔽、只有你能看出来的Bug，目前不影响演示。你会？",
                 a: [
-                    { text: "立刻动手重构。把旧计划扔进垃圾桶，马上尝试拼凑出一个新的解决方案。", points: ["001", "007", "010"] },
-                    { text: "寻找根本原因。绝对不盲目行动，先找出到底是哪个底层逻辑出了致命Bug。", points: ["002", "008", "005"] },
-                    { text: "保底与止损。第一时间确认核心资产和人员的安全，确保系统不会进一步崩溃。", points: ["003", "006"] },
-                    { text: "安抚团队情绪。危机可以等5分钟再处理，但绝不能让团队在此刻陷入恐慌。", points: ["004", "009", "011"] }
+                    { text: "照常交付上线。先拿下结果和节点，哪怕日后自己疯狂加班打补丁弥补。", points: ["010", "001", "007"] }, // 速度与结果优先
+                    { text: "立刻叫停交付。顶着所有人的骂名，即使项目延期，也绝对不能让带病的代码上线。", points: ["002", "008", "005"] }, // 本质与底线优先
+                    { text: "准备极其详尽的备用回滚方案。照常演示，但一旦出事，能在1秒内切回安全状态。", points: ["003", "006", "012"] }, // 兜底与秩序优先
+                    { text: "立刻拉通核心团队，用最高情商安抚各方情绪，共创一个能同时应付两头的说辞。", points: ["009", "011", "004"] }  // 关系与氛围优先
                 ]
             },
             {
-                q: "当你走进一个完全漆黑、未知的房间，你的做法是？",
+                q: "团队新加入了一个业绩能力极其恐怖的天才，但他极度傲慢，无视所有规则并经常刺伤队友。你会如何处理他？",
                 a: [
-                    { text: "直接往里走。碰壁了就知道边界在哪，边走边摸索就是最快的方式。", points: ["010", "007", "012"] },
-                    { text: "站在原地摸索墙壁，寻找开关，并在脑海里测算房间的尺寸和可能的地形。", points: ["002", "008", "005"] },
-                    { text: "守在门口。在没有确保退路安全、弄清楚里面有什么之前，绝不贸然深入。", points: ["003", "006"] },
-                    { text: "大声喊一句“有人吗？”，把一个未知的恐惧变成一次潜在的互动。", points: ["011", "004", "009"] }
+                    { text: "放权并给他最高的自由度。只要能打下江山，我愿意承受他带来的破坏和混乱。", points: ["001", "007", "010"] }, 
+                    { text: "榨取他的认知价值。不在乎他的态度，只要能把他的顶级逻辑和方法论提取出来就行。", points: ["002", "008"] }, 
+                    { text: "坚决清理出局。任何人都不能凌驾于系统的秩序之上，哪怕他是神，也不能摧毁团队基石。", points: ["003", "006", "005"] }, 
+                    { text: "主动去深度接触他，寻找他傲慢外表下的心理缺失，试图将这把野兽般的刀感化为己用。", points: ["009", "011", "004", "012"] } 
                 ]
             },
             {
-                q: "别人对你的哪种评价，会让你觉得“他真的懂我”？",
+                q: "当你被扔进一个完全未知的领域（比如让你从零开始搭建一个你从未接触过的系统），你的第一反应是？",
                 a: [
-                    { text: "“你是个真正的破局者，只要你在，就没有做不成的事。”", points: ["001", "007", "010"] },
-                    { text: "“你看问题太透彻了，总能一针见血地指出所有人都忽略的本质。”", points: ["002", "008", "005"] },
-                    { text: "“你太靠谱了，只要事情交给你，我就可以安心睡个好觉。”", points: ["003", "006", "012"] },
-                    { text: "“和你相处太舒服了，你总是能敏锐地察觉并治愈我的情绪。”", points: ["004", "009", "011"] }
+                    { text: "先让手脏起来。别管什么理论，直接去拼凑现有工具，跑通第一个极简模型（MVP）。", points: ["010", "001", "007"] }, 
+                    { text: "闭关研究。查阅大量的底层资料和论文，直到我能在脑海里清晰地画出整个架构树。", points: ["002", "008", "005"] }, 
+                    { text: "列出排期表。梳理可用的资源、预算和最坏的风险预案，确保每一步都在控制之中。", points: ["003", "006", "012"] }, 
+                    { text: "到处找人聊。找那些做过类似事情的行业大佬喝咖啡，用连接力快速获取核心诀窍。", points: ["009", "011", "004"] } 
                 ]
             },
             {
-                q: "当你发现公司里有一项“历史遗留”的严苛规则，严重阻碍了效率，你会？",
+                q: "团队开会时，对于一个重大决议，所有人都在无休止地争论，且都非常有道理。你会如何终结这场会议？",
                 a: [
-                    { text: "直接无视它，用结果证明新方法更好，大不了事后再道歉。", points: ["007", "010", "001"] },
-                    { text: "深挖这项规则当年设立的背景，找出它的逻辑漏洞，然后去辩论。", points: ["008", "002"] },
-                    { text: "暂时遵守，但开始着手写一份严谨详实的改革方案，走流程去推翻它。", points: ["003", "006", "005"] },
-                    { text: "用一种高情商、不伤和气的方式“绕过去”，既办了事，又不得罪人。", points: ["009", "011", "012"] }
+                    { text: "“别吵了，就按A方案做，出了问题我负责。” —— 用强权和行动直接破局。", points: ["001", "010", "012"] }, 
+                    { text: "“你们的逻辑都有致命伤，我们来看这两组核心数据。” —— 用最冷血的客观事实降维打击。", points: ["002", "008", "005"] }, 
+                    { text: "“不管选哪个，底线是成本不能超。谁能保证不爆雷，就听谁的。” —— 强调系统的生死线。", points: ["003", "006"] }, 
+                    { text: "“大家都累了，我们的初衷是为了赢，不是为了证明谁对。” —— 瓦解对立情绪，重新凝聚人心。", points: ["009", "004", "011"] } 
                 ]
             },
             {
-                q: "如果你必须选择一种绝对的“超能力”，你最渴望的是？",
+                q: "在评价一个人的“价值”时，你内心深处极其排他的最高标准是什么？",
                 a: [
-                    { text: "【造物之手】：能把脑海中想象的任何事物，瞬间在现实中构建出来。", points: ["001", "007", "010"] },
-                    { text: "【真理之眼】：一眼就能看透世界上任何复杂系统的底层规律和谎言。", points: ["002", "008", "005"] },
-                    { text: "【时间回溯】：能暂停或倒退时间，让你有足够的机会去修复错误、保护大家。", points: ["003", "006"] },
-                    { text: "【心灵感应】：能够完美地共情世界上任何一个人的喜怒哀乐，并治愈他们。", points: ["004", "009", "011"] }
+                    { text: "【创造力】：他能否无中生有，把一件事情从 0 变成 1。", points: ["001", "007", "010"] }, 
+                    { text: "【洞察力】：他能否在极度复杂的迷雾中，一眼看透事物的本质。", points: ["002", "008", "005"] }, 
+                    { text: "【确定性】：他是不是一个无论发生什么，永远都不会崩盘、绝对可控的人。", points: ["003", "006", "012"] }, 
+                    { text: "【共情力】：他能否敏锐地察觉他人的痛苦，并给予真正有力量的托举。", points: ["009", "004", "011"] } 
                 ]
             },
             {
-                q: "如果你突然获得了一大笔完全可以自由支配的奖金，你第一件做的事大概率是？",
+                q: "当现有的所有规则和流程，都在严重拖累你完成一个本该能极高产出的目标时，你会？",
                 a: [
-                    { text: "买最好的设备升级你的生产力，或者直接买张机票去进行一场疯狂的冒险。", points: ["001", "007", "010"] },
-                    { text: "买下你一直眼馋的稀有书籍、顶级课程，或者前沿科技产品。", points: ["002", "008"] },
-                    { text: "存进最稳妥的账户，买好保险或不动产，将未来的安全感直接拉满。", points: ["003", "006", "005"] },
-                    { text: "办一场极其难忘的派对，或者给每一个重要的人都挑一件昂贵的礼物。", points: ["004", "009", "011"] }
+                    { text: "彻底无视规则。事后可能会被处罚，但当我把巨大的战果摆在桌上，一切都会被原谅。", points: ["007", "010", "001"] }, 
+                    { text: "精读规则条款。找到里面的法律/逻辑盲区，在不违反字面意思的情况下完美绕过它。", points: ["002", "008"] }, 
+                    { text: "隐忍并蛰伏。规则就是规则，我会顺应它，直到我爬到能亲自重写规则的位置。", points: ["003", "006", "005", "012"] }, 
+                    { text: "动用人脉杠杆。找到制定或管理规则的那个人，用情感和利益说服他为我开绿灯。", points: ["009", "011", "004"] } 
                 ]
             },
             {
-                q: "有两个你很在乎的朋友发生了激烈的争吵，你通常扮演的角色是？",
+                q: "你倾注了半年心血的项目遭遇不可抗力，面临彻底的失败。在最崩溃的那个夜晚，你是如何自救的？",
                 a: [
-                    { text: "【破局者】：“行了别吵了！走，去打球/喝酒，把这破事忘了！”", points: ["007", "010", "012"] },
-                    { text: "【裁判员】：抛开情绪，极其冷静地指出他们双方各自在逻辑上的漏洞。", points: ["002", "008", "005"] },
-                    { text: "【锚点】：什么也不多说，只是坚定地站在那里，确保他们不会做出越界的举动。", points: ["003", "006"] },
-                    { text: "【调解员】：分别倾听他们心里的委屈，让双方的情绪都被看见，直至软化。", points: ["009", "011", "004"] }
+                    { text: "立刻注册一个新域名/拉一个新群。用启动一个新事物的快感，强行覆盖失败的痛苦。", points: ["007", "010", "001"] }, 
+                    { text: "把自己关起来做一场极其残酷的尸检报告。不是谁的错，是哪一行公式写错了。", points: ["002", "008", "005"] }, 
+                    { text: "清点剩余资产。盘点还剩多少钱、多少人，确保团队的元气没有被彻底打散，等待重建。", points: ["003", "006", "012"] }, 
+                    { text: "接受自己的脆弱。找最懂我的人大哭一场，然后把这段经历写成故事，让痛苦升华。", points: ["009", "011", "004"] } 
                 ]
             },
             {
-                q: "让你觉得最舒适、最能产出的理想工作环境，长什么样？",
+                q: "一场极其艰难的战役终于打赢了，在庆功宴上，你最享受的瞬间是？",
                 a: [
-                    { text: "看似杂乱但极度顺手的“车间”：到处是白板、草稿、贴纸和未完成的原型。", points: ["001", "007", "010"] },
-                    { text: "绝对安静、极简的“实验室”：只有多块屏幕和降噪耳机，没有任何冗余信息。", points: ["002", "008", "005"] },
-                    { text: "高度秩序化的“控制塔”：所有的文件、工具都在固定的位置，一切都在掌控中。", points: ["003", "006", "012"] },
-                    { text: "充满生机的“咖啡馆”：有照片墙、暖光灯，随时可以有人坐下来一起聊天碰撞。", points: ["004", "009", "011"] }
+                    { text: "看着自己亲手打下的版图，脑海里已经开始规划下一个更疯狂的征服目标。", points: ["001", "010", "007"] }, 
+                    { text: "那个纠缠了你几个月的复杂难题，在脑海中闭环、彻底解开的那种极致的智力愉悦。", points: ["002", "008", "005"] }, 
+                    { text: "看着身边这群人。我们一起挺过来了，且系统运转得极其健康，没有一个人掉队。", points: ["003", "006", "012"] }, 
+                    { text: "当大家举杯相拥，那种在场所有人情绪完全共振、彼此深深信任的极致连接感。", points: ["004", "009", "011"] } 
                 ]
             },
             {
-                q: "你倾注了全部心血的一个项目，最后迎来了惨烈的失败。你如何自我修复？",
+                q: "如果要你在自己的性格里植入一个绝对的“缺陷”，你宁愿选择哪个？",
                 a: [
-                    { text: "立刻开启一个全新的项目。“Next！”用新的行动覆盖旧的失败。", points: ["007", "010", "001"] },
-                    { text: "做一次极其冷酷无情的复盘，直到弄清楚到底是哪个环节的数学/逻辑死了。", points: ["002", "008", "005"] },
-                    { text: "安静地清理战场，把团队的损失降到最低，然后默默地重新打地基。", points: ["003", "006"] },
-                    { text: "找最亲近的人大哭一场，或者把它写成一篇深刻的文章，让失败变成故事。", points: ["009", "011", "004"] }
+                    { text: "极度的急躁与不耐烦。忍受不了任何缓慢和迟疑，导致经常冲锋过头。", points: ["010", "001", "007"] }, 
+                    { text: "极度的冷血与理智。为了追求真理，可以剥离掉所有感性，让人觉得不近人情。", points: ["002", "008", "005"] }, 
+                    { text: "极度的固执与保守。为了守住底线，可以拒绝所有看似光鲜的诱惑和捷径。", points: ["003", "006", "012"] }, 
+                    { text: "极度的心软与情绪化。容易被他人的痛苦牵扯，导致在杀伐决断时不够果决。", points: ["009", "004", "011"] } 
                 ]
             },
             {
-                q: "如果世界末日即将来临，只能带一样东西上飞船，你会带？",
+                q: "在一艘即将沉没、且只能带走一样东西的飞船上，代表你终极信念的是？",
                 a: [
-                    { text: "包含全人类最高制造技术和图纸的硬盘。", points: ["001", "007", "010"] },
-                    { text: "记录了宇宙所有物理定理和哲学真相的芯片。", points: ["002", "008"] },
-                    { text: "能维持生命系统运转最久的终极能源种子。", points: ["003", "006", "005"] },
-                    { text: "记录了人类所有艺术、音乐、情感诗歌的记忆库。", points: ["011", "009", "004"] }
+                    { text: "一把能建造一切的万能工具枪。", points: ["001", "010", "007"] }, 
+                    { text: "一枚装载了宇宙所有客观定律和知识的芯片。", points: ["002", "008", "005"] }, 
+                    { text: "一颗能让任何恶劣环境重新长出秩序与生命的种子。", points: ["003", "006", "012"] }, 
+                    { text: "一本记录了人类所有荒诞、美丽、痛苦与爱的诗集。", points: ["011", "009", "004"] } 
                 ]
             },
             {
-                q: "要挑选一个人作为极限生存游戏的搭档，你绝对会选谁？",
+                q: "有人用极其难听、但似乎又有几分道理的话当众攻击了你的工作，你的第一反应是？",
                 a: [
-                    { text: "行动力爆表的人。无论遇到什么，他都能立刻用最快速度造出武器或工具。", points: ["001", "010", "007"] },
-                    { text: "智力超群的人。他认识所有的毒草，能靠星星辨别方向，永远知道最优解。", points: ["002", "008", "005"] },
-                    { text: "耐力惊人的人。他永远不会抱怨，能在绝境中抗下所有重物和压力。", points: ["003", "006", "012"] },
-                    { text: "永远乐观的人。就算只剩一口水，他也能讲个笑话让你觉得明天还有希望。", points: ["004", "011", "009"] }
+                    { text: "直接怼回去，或者立刻用一个碾压级的战绩把他的脸打肿。", points: ["010", "001", "007"] }, 
+                    { text: "屏蔽他的情绪词汇，在大脑里拆解他话里那“几分道理”到底在逻辑上成不成立。", points: ["002", "008", "005"] }, 
+                    { text: "面无表情地看着他，不卑不亢。只要没有触犯我的核心底线，随便他怎么跳。", points: ["003", "006", "012"] }, 
+                    { text: "用一种幽默或自黑的方式巧妙化解尴尬，既保全了自己的体面，也掌控了全场气氛。", points: ["004", "011", "009"] } 
                 ]
             },
             {
-                q: "当你在人生的终点回望一生，你最希望看到的画面是？",
+                q: "这世界很大，但你内心真正渴望成为的是一种什么样的人？",
                 a: [
-                    { text: "一座座由你亲手建立的里程碑，和那些被你开拓出来的、前所未有的新世界。", points: ["001", "007", "010"] },
-                    { text: "宇宙的终极奥秘在你眼前展开，你带着对这个世界毫无遗憾的“理解”离去。", points: ["002", "008"] },
-                    { text: "一个因为你的守护而变得极其稳固、繁荣的家族或组织，他们安全且强大。", points: ["003", "006", "005"] },
-                    { text: "无数条因你而交织的命运线，以及那些因为你的存在而变得更温暖的灵魂。", points: ["009", "011", "004"] }
+                    { text: "一个无法被定义的风暴眼。我在哪里，哪里就有新的规则和生机被创造出来。", points: ["001", "007", "010"] }, 
+                    { text: "一个清醒的旁观者。在这个疯狂的世界里，永远保持最高维的认知和最通透的目光。", points: ["002", "008", "005"] }, 
+                    { text: "一座不可撼动的大山。任凭外界如何变幻，我始终坚定地托举着我所珍视的一切。", points: ["003", "006", "012"] }, 
+                    { text: "一束温柔的火光。让每一个靠近我的人，都能在这个冷漠的世界里感到被理解、被照亮。", points: ["009", "004", "011"] } 
                 ]
             }
         ];
@@ -320,7 +318,7 @@
 
         function showQuestion() {
             const qData = questions[currentQuestion];
-            document.getElementById('question').innerText = `Q${currentQuestion + 1} / ${questions.length} \n\n ${qData.q}`;
+            document.getElementById('question').innerHTML = `<span style="color: var(--accent); font-size: 0.9rem; letter-spacing: 2px;">QUESTION ${currentQuestion + 1}/${questions.length}</span><br><br>${qData.q}`;
             
             setTimeout(() => { document.getElementById('progress').style.width = `${((currentQuestion) / questions.length) * 100}%`; }, 50);
 
@@ -344,7 +342,6 @@
             currentQuestion++;
 
             if (currentQuestion < questions.length) {
-                // 增加题目的淡入淡出动效过渡
                 const quizSec = document.getElementById('quiz-section');
                 quizSec.style.opacity = '0';
                 setTimeout(() => {
@@ -394,12 +391,12 @@
         let myChart = null;
         function renderRadarChart() {
             const dimensionScores = [
-                scores["001"] + scores["007"], // 创造与探索 (Builder, Explorer)
-                scores["002"] + scores["008"], // 智慧与挑战 (Researcher, Challenger)
-                scores["003"] + scores["006"] + scores["005"], // 秩序与守护 (Backbone, Warden, Guardian)
-                scores["009"] + scores["011"], // 共情与故事 (Connector, Storyteller)
-                scores["010"] + scores["012"], // 行动与开拓 (Vanguard, Pioneer)
-                scores["004"] + scores["009"]  // 情绪与治愈 (Spark, Connector)
+                scores["001"] + scores["007"], 
+                scores["002"] + scores["008"], 
+                scores["003"] + scores["006"] + scores["005"], 
+                scores["009"] + scores["011"], 
+                scores["010"] + scores["012"], 
+                scores["004"] + scores["009"]  
             ];
 
             const ctx = document.getElementById('radarChart').getContext('2d');
@@ -408,18 +405,18 @@
             myChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['创造突破', '智慧求真', '守护托底', '共情链接', '先锋行动', '情绪火花'],
+                    labels: ['破局创造', '本质洞察', '秩序兜底', '共情连接', '野蛮行动', '情绪感染'],
                     datasets: [{
-                        label: '信念象限',
+                        label: '能力象限',
                         data: dimensionScores,
-                        backgroundColor: 'rgba(100, 255, 218, 0.15)',
+                        backgroundColor: 'rgba(100, 255, 218, 0.1)',
                         borderColor: '#64ffda',
                         pointBackgroundColor: '#64ffda',
-                        pointBorderColor: '#fff',
+                        pointBorderColor: '#05070a',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: '#64ffda',
-                        borderWidth: 2,
-                        tension: 0.3
+                        borderWidth: 1.5,
+                        tension: 0.2
                     }]
                 },
                 options: {
@@ -429,7 +426,7 @@
                         r: {
                             angleLines: { color: 'rgba(255, 255, 255, 0.05)' },
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            pointLabels: { color: '#9ca3af', font: { size: 12, family: '-apple-system', weight: '300' } },
+                            pointLabels: { color: '#9ca3af', font: { size: 12, family: '-apple-system', weight: '400' } },
                             ticks: { display: false, min: 0 }
                         }
                     },
